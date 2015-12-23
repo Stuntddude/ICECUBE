@@ -120,7 +120,7 @@ public final class Player {
 		}
 
 		if (boing && onFloor)
-			vel = vel.add(new Vector2(0, -0.6/PApplet.max(size.x, 0.38f)));
+			vel = new Vector2(0, -0.6/PApplet.max(size.x, 0.38f));
 
 		if (shouldShrink)
 			shrink();
