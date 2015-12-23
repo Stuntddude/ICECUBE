@@ -10,3 +10,26 @@
 
 # virtual machine crash logs, see http://www.java.com/en/download/help/error_hotspot.xml
 hs_err_pid*
+
+#OS X Resource Forks
+.DS_Store
+._.*
+
+#Eclipse project files
+.metadata/
+.settings/
+.classpath
+.project
+
+#Custom Excludes
+res-src/
+bin/
+libs/
+*.launch
+export-*.xml
+git-*.sh
+build.xml
+export.pro
+package.sh
+proguard-mapping.txt
+redist/
