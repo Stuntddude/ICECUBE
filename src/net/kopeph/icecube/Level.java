@@ -6,7 +6,6 @@ import java.util.Map;
 
 import net.kopeph.icecube.tile.*;
 import net.kopeph.icecube.util.Rectangle;
-import net.kopeph.icecube.util.Vector2;
 import processing.core.PGraphics;
 import processing.core.PImage;
 
@@ -91,14 +90,11 @@ public final class Level {
 		return doors;
 	}
 
-	//finds the position of a tile in the array by its position in world space
-	public int reverseLookup(Vector2 pos) {
-		int x = Math.round(pos.x);
-		int y = Math.round(pos.y);
-		return y*width + x;
-	}
-
 	public Tile tileAt(int x, int y) {
+		//four-directional bounds checking is necessary so we don't wrap around
+		//otherwise I would precompute y*width + x and just bounds-check the array
+		if (x < 0 || y < 0 || x >= width || y >= height)
+			return null;
 		return tiles[y*width + x];
 	}
 

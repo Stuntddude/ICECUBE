@@ -90,7 +90,7 @@ public final class Player {
 		//only loop through tiles near the player, for efficiency
 		Rectangle hb = toRect();
 		int minx = Math.max(0, PApplet.floor(hb.pos.x));
-		int maxx = Math.min(context.level.width - 1, PApplet.ceil(hb.right()));
+		int maxx = Math.min(context.level.width, PApplet.ceil(hb.right()));
 		int miny = Math.max(0, PApplet.floor(hb.pos.y));
 		int maxy = Math.min(context.level.height - 1, PApplet.ceil(hb.bottom()));
 		for (int x = minx; x < maxx; ++x) {
@@ -209,28 +209,28 @@ public final class Player {
 
 	/** find and resolve all collisions for a given offset */
 	private Vector2 moveWithCollisionImpl(Vector2 offset) {
-		//constrain the player to within the level using existing collision code
-		if (toRect().move(offset).intersects(context.level.top))
-			offset = eject(context.level.top, offset);
-		if (toRect().move(offset).intersects(context.level.bottom))
-			offset = eject(context.level.bottom, offset);
-		if (toRect().move(offset).intersects(context.level.left))
-			offset = eject(context.level.left, offset);
-		if (toRect().move(offset).intersects(context.level.right))
-			offset = eject(context.level.right, offset);
-
-		Tile collision = null;
+		Rectangle collision = null;
 		do { //handle collisions until the player is free from all tiles
 			collision = findIntersection(toRect().move(offset));
 			if (collision != null)
-				offset = eject(collision.toRect(), offset);
+				offset = eject(collision, offset);
 		} while (collision != null);
 
 		pos = pos.add(offset);
 		return offset;
 	}
 
-	private Tile findIntersection(Rectangle hb) {
+	private Rectangle findIntersection(Rectangle hb) {
+		//check for collision with the level borders as well as with tiles within the level
+		if (hb.intersects(context.level.top))
+			return context.level.top;
+		if (hb.intersects(context.level.bottom))
+			return context.level.bottom;
+		if (hb.intersects(context.level.left))
+			return context.level.left;
+		if (hb.intersects(context.level.right))
+			return context.level.right;
+
 		//only loop through tiles near the player, for efficiency
 		int minx = Math.max(0, PApplet.floor(hb.pos.x));
 		int maxx = Math.min(context.level.width, PApplet.ceil(hb.right()));
@@ -240,7 +240,7 @@ public final class Player {
 			for (int y = miny; y < maxy; ++y) {
 				Tile tile = context.level.tileAt(x, y);
 				if (tile != null && tile.hasCollision() && hb.intersects(tile.toRect()))
-					return tile;
+					return tile.toRect();
 			}
 		}
 		return null;
