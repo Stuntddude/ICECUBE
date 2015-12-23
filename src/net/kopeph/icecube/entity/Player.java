@@ -195,6 +195,11 @@ public final class Player {
 	private void moveWithCollision(Vector2 offset) {
 		Vector2 projected = pos.add(offset); //projected position of player after applying offset (used for wall sliding)
 
+		//constrain offset vector to leave the player within the level
+		projected = new Vector2(PApplet.constrain(projected.x, 0.0f, context.level.width - size.x),
+								PApplet.constrain(projected.y, 0.0f, context.level.height - size.y));
+		offset = projected.sub(pos);
+
 		offset = moveWithCollisionImpl(offset);
 
 		//keep track of this for jumping logic
