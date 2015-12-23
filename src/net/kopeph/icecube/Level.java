@@ -5,6 +5,7 @@ import java.util.HashMap;
 import java.util.Map;
 
 import net.kopeph.icecube.tile.*;
+import net.kopeph.icecube.util.Rectangle;
 import net.kopeph.icecube.util.Vector2;
 import processing.core.PGraphics;
 import processing.core.PImage;
@@ -15,6 +16,12 @@ public final class Level {
 
 	public final int width, height;
 	public final Tile[] tiles;
+
+	//rectangles to simulate collision with the borders of the level
+	public final Rectangle top;
+	public final Rectangle bottom;
+	public final Rectangle left;
+	public final Rectangle right;
 
 	public Level(String levelName) {
 		PImage img = context.loadImage("res/" + levelName + ".png");
@@ -57,6 +64,12 @@ public final class Level {
 				}
 			}
 		}
+
+		//initialize level borders
+		top = new Rectangle(-width, -height, width*3, height);
+		bottom = new Rectangle(-width, height, width*3, height);
+		left = new Rectangle(-width, 0, width, height);
+		right = new Rectangle(width, 0, width, height);
 
 		//TODO: better level validation maybe?
 	}

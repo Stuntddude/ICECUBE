@@ -137,10 +137,6 @@ public final class Player {
 		if (size.x <= 0.0f)
 			dead = true;
 
-		//avoid player falling out of the level (as sometimes happens with trampolines when they are tiny)
-		if (pos.x < 0 || pos.y < 0 || pos.x > context.level.width ||pos.y > context.level.height)
-			dead = true;
-
 		//PApplet.println("player: " + pos + "\tvelocity: " + vel + "\tsize: " + size + "\t" + offset); //DEBUG
 	}
 
@@ -195,11 +191,6 @@ public final class Player {
 	private void moveWithCollision(Vector2 offset) {
 		Vector2 projected = pos.add(offset); //projected position of player after applying offset (used for wall sliding)
 
-		//constrain offset vector to leave the player within the level
-		projected = new Vector2(PApplet.constrain(projected.x, 0.0f, context.level.width - size.x),
-								PApplet.constrain(projected.y, 0.0f, context.level.height - size.y));
-		offset = projected.sub(pos);
-
 		offset = moveWithCollisionImpl(offset);
 
 		//keep track of this for jumping logic
@@ -218,11 +209,21 @@ public final class Player {
 
 	/** find and resolve all collisions for a given offset */
 	private Vector2 moveWithCollisionImpl(Vector2 offset) {
+		//constrain the player to within the level using existing collision code
+		if (toRect().move(offset).intersects(context.level.top))
+			offset = eject(context.level.top, offset);
+		if (toRect().move(offset).intersects(context.level.bottom))
+			offset = eject(context.level.bottom, offset);
+		if (toRect().move(offset).intersects(context.level.left))
+			offset = eject(context.level.left, offset);
+		if (toRect().move(offset).intersects(context.level.right))
+			offset = eject(context.level.right, offset);
+
 		Tile collision = null;
 		do { //handle collisions until the player is free from all tiles
 			collision = findIntersection(toRect().move(offset));
 			if (collision != null)
-				offset = eject(collision, offset);
+				offset = eject(collision.toRect(), offset);
 		} while (collision != null);
 
 		pos = pos.add(offset);
@@ -245,7 +246,7 @@ public final class Player {
 		return null;
 	}
 
-	private Vector2 eject(Tile collision, Vector2 offset) {
+	private Vector2 eject(Rectangle collision, Vector2 offset) {
 		//XXX: do we need to protect against NaNs?
 		if (offset.x == 0.0f && offset.y == 0.0f)
 			ICECUBE.println("NaN IN THE DUNGEON! THERE'S A NaN IN THE DUNGEON! Just thought you ought to know...");
@@ -255,8 +256,8 @@ public final class Player {
 
 		//find the shortest path to backtrack that gets the player to where they're not colliding
 		//the minimum distance straight along x or y axis the player must be ejected to exit collision
-		float dx = offset.x > 0? hb.right()  - collision.pos.x : hb.pos.x - collision.toRect().right();
-		float dy = offset.y > 0? hb.bottom() - collision.pos.y : hb.pos.y - collision.toRect().bottom();
+		float dx = offset.x > 0? hb.right()  - collision.pos.x : hb.pos.x - collision.right();
+		float dy = offset.y > 0? hb.bottom() - collision.pos.y : hb.pos.y - collision.bottom();
 
 		//XXX: consider changing this so that the slope is only calculated once before all ejections (may remove infinite loop behavior)
 		float slope = offset.y/offset.x; //division by 0 should not be an issue since we get infinity, which plays nicely with the next step
