@@ -103,7 +103,7 @@ public final class Player {
 					}
 				} else if (tile instanceof SizePad) {
 					if (toRect().intersects(tile.toRect().move(new Vector2(0, -0.5f)))) {
-						if (tile instanceof RedPad) {
+						if (tile instanceof BluePad) {
 							shouldGrow = true;
 							//XXX: MORE DUCT TAPE
 							pos = pos.sub(new Vector2(0, BREATHING_ROOM));
