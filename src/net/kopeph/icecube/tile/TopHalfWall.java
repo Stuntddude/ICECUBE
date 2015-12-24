@@ -2,7 +2,6 @@ package net.kopeph.icecube.tile;
 
 import net.kopeph.icecube.util.Rectangle;
 import net.kopeph.icecube.util.Vector2;
-import processing.core.PGraphics;
 
 public final class TopHalfWall extends Tile {
 	private static final int COLOR = 0xFF000000;
@@ -29,11 +28,5 @@ public final class TopHalfWall extends Tile {
 	public void draw() {
 		context.fill(color);
 		context.rect(pos.x*TILE_SIZE - context.origin.x, pos.y*TILE_SIZE - context.origin.y, TILE_SIZE, TILE_SIZE/2);
-	}
-
-	@Override
-	public void draw(PGraphics canvas) {
-		canvas.fill(color);
-		canvas.rect(pos.x*TILE_SIZE, pos.y*TILE_SIZE, TILE_SIZE, TILE_SIZE/2);
 	}
 }

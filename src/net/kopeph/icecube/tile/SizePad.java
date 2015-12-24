@@ -1,7 +1,6 @@
 package net.kopeph.icecube.tile;
 
 import net.kopeph.icecube.util.Vector2;
-import processing.core.PGraphics;
 
 /** common superclass of RedTile and BlueTile */
 public class SizePad extends Tile {
@@ -32,19 +31,5 @@ public class SizePad extends Tile {
 		//draw the pad into the top half of the tile, rounding bottom corners where applicable
 		context.rect(pos.x*TILE_SIZE - context.origin.x, pos.y*TILE_SIZE - context.origin.y, TILE_SIZE, TILE_SIZE/2,
 					 0, 0, neighborRight? 0 : TILE_SIZE, neighborLeft? 0 : TILE_SIZE);
-	}
-
-	@Override
-	public void draw(PGraphics canvas) {
-		canvas.fill(0xFF000000);
-		canvas.rect(pos.x*TILE_SIZE, pos.y*TILE_SIZE, TILE_SIZE, TILE_SIZE);
-
-		canvas.fill(color);
-		int x = Math.round(pos.x), y = Math.round(pos.y);
-		boolean neighborLeft = context.level.tileAt(x - 1, y) instanceof SizePad;
-		boolean neighborRight = context.level.tileAt(x + 1, y) instanceof SizePad;
-
-		canvas.rect(pos.x*TILE_SIZE, pos.y*TILE_SIZE, TILE_SIZE, TILE_SIZE/2,
-					0, 0, neighborRight? 0 : TILE_SIZE, neighborLeft? 0 : TILE_SIZE);
 	}
 }

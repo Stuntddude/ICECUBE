@@ -98,31 +98,14 @@ public final class Level {
 		return tiles[y*width + x];
 	}
 
-	//draws all the non-animated tiles onto a static canvas which is then drawn onto the screen
-	//this way we are drawing all w*h tiles only once per level load, rather than every frame
-	public void bake() {
-		canvas = context.createGraphics(Math.round(width*Tile.TILE_SIZE), Math.round(height*Tile.TILE_SIZE));
+	public void draw() {
+		context.fill(0xFFAAAAAA); //a neutral grey
+		context.rect(-context.origin.x, -context.origin.y, width*Tile.TILE_SIZE, height*Tile.TILE_SIZE);
 
-		canvas.beginDraw();
-		canvas.noStroke();
-		canvas.background(0xFFAAAAAA); //a neutral grey
-
+		//TODO: consider a loop to only draw the tiles that are currently on-screen
+		//the above will be the final step in making off-screen tiles basically free in performance terms
 		for (Tile tile : tiles)
 			if (tile != null)
-				tile.draw(canvas);
-
-		canvas.endDraw();
-
-		//context.println("I'm so baked right now!"); //debug
-	}
-
-	private float lastTileSize = 0; //so we know when to re-bake
-
-	public void draw() {
-		if (Tile.TILE_SIZE != lastTileSize)
-			bake();
-		lastTileSize = Tile.TILE_SIZE;
-
-		context.image(canvas, -context.origin.x, -context.origin.y);
+				tile.draw();
 	}
 }
