@@ -20,6 +20,7 @@ public final class ICECUBE extends PApplet {
 	private Player backup; //used to neatly reset the player's position and size if they die in a level
 
 	private boolean left, right, up, down, space; //for player movement TODO: move elsewhere
+	private boolean w, a, s, d;
 	private static ICECUBE context;
 
 	@Override
@@ -68,7 +69,7 @@ public final class ICECUBE extends PApplet {
 	@Override
 	public void draw() {
 		//move player
-		player.move(left, right, up, down, space);
+		player.move(left || a, right || d, up || w, down || s, space);
 
 		//update follow cam origin
 		Vector2 screenCenter = originf.add(new Vector2(width/2, height/2));
@@ -95,10 +96,10 @@ public final class ICECUBE extends PApplet {
 			}
 		} else {
 			switch(Character.toUpperCase(key)) {
-				case 'A': left  = true; break;
-				case 'D': right = true; break;
-				case 'W': up    = true; break;
-				case 'S': down  = true; break;
+				case 'A': a = true; break;
+				case 'D': d = true; break;
+				case 'W': w = true; break;
+				case 'S': s = true; break;
 				case ' ': space = true; break;
 				case 'R': resetLevel(); break;
 			}
@@ -117,10 +118,10 @@ public final class ICECUBE extends PApplet {
 			}
 		} else {
 			switch(Character.toUpperCase(key)) {
-				case 'A': left  = false; break;
-				case 'D': right = false; break;
-				case 'W': up    = false; break;
-				case 'S': down  = false; break;
+				case 'A': a = false; break;
+				case 'D': d = false; break;
+				case 'W': w = false; break;
+				case 'S': s = false; break;
 				case ' ': space = false; break;
 			}
 		}
