@@ -13,6 +13,6 @@ Building Directions (Eclipse Java 8)
   2. *Project Settings > Java Build Path > Libraries* Remove any existing libraries
   3. *Project Settings > Java Build Path > Libraries > Add Library > JRE System* choose jdk1.8
 4. **Add required libraries** to the class path:
-  1. [`core.jar`](http://stuntddude.github.io/Blockade-Runner/3rd-party/processing_core-2.2.1.jar) for **Processing 2.2.1**
+  1. [`core.jar`](http://stuntddude.github.io/ICECUBE/3rd-party/processing_core-3.0.1.jar) for **Processing 3.0.1**
 5. **Run/Debug** with Main class: `net.kopeph.icecube.ICECUBE`
 6. **Export** as a *Runnable Jar*.
