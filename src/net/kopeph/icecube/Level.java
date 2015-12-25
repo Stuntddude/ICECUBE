@@ -32,36 +32,36 @@ public final class Level {
 		height = img.height;
 
 		tiles = new Tile[img.pixels.length];
-		for (int x = 0; x < width; ++x) {
-			for (int y = 0; y < height; ++y) {
+		for (int y = 0; y < height; ++y) {
+			for (int x = 0; x < width; ++x) {
 				int i = y*width + x;
 				switch (img.pixels[i]) {
-				//XXX: wet code smell
-				case 0xFF000000:
-					tiles[i] = new WallTile(x, y);
-					break;
-				case 0xFFFF0000:
-					tiles[i] = new RedPad(x, y);
-					break;
-				case 0xFF0000FF:
-					tiles[i] = new BluePad(x, y);
-					break;
-				case 0xFF00FF00:
-					tiles[i] = new GoalTile(x, y, doors.get(new Point(x, y)));
-					break;
-				case 0xFF808080:
-					tiles[i] = new TopHalfWall(x, y);
-					break;
-				case 0xFFFFFF00:
-					tiles[i] = new Door(x, y, doors.get(new Point(x, y)));
-					break;
-				case 0xFFFF8000:
-					tiles[i] = new Spring(x, y);
-					break;
-				case 0xFFFF00FF:
-					//XXX: player may end up inside a wall if there is no magenta pixel in level
-					context.player.moveTo(x + 0.5f, y + 0.5f);
-					break;
+					//XXX: wet code smell
+					case 0xFF000000:
+						tiles[i] = new WallTile(x, y);
+						break;
+					case 0xFFFF0000:
+						tiles[i] = new RedPad(x, y);
+						break;
+					case 0xFF0000FF:
+						tiles[i] = new BluePad(x, y);
+						break;
+					case 0xFF00FF00:
+						tiles[i] = new GoalTile(x, y, doors.get(new Point(x, y)));
+						break;
+					case 0xFF808080:
+						tiles[i] = new TopHalfWall(x, y);
+						break;
+					case 0xFFFFFF00:
+						tiles[i] = new Door(x, y, doors.get(new Point(x, y)));
+						break;
+					case 0xFFFF8000:
+						tiles[i] = new Spring(x, y);
+						break;
+					case 0xFFFF00FF:
+						//XXX: player may end up inside a wall if there is no magenta pixel in level
+						context.player.moveTo(x + 0.5f, y + 0.5f);
+						break;
 				}
 			}
 		}
