@@ -1,10 +1,11 @@
 package net.kopeph.icecube;
 
+import processing.core.PApplet;
+import processing.event.MouseEvent;
+
 import net.kopeph.icecube.entity.Player;
 import net.kopeph.icecube.tile.Tile;
 import net.kopeph.icecube.util.Vector2;
-import processing.core.PApplet;
-import processing.event.MouseEvent;
 
 /**
  * A note about the game's coordinate system:
@@ -21,6 +22,7 @@ public final class ICECUBE extends PApplet {
 
 	private boolean left, right, up, down, space;
 	private boolean w, a, s, d;
+	private String devel; //null means not in devel
 	private static ICECUBE context;
 
 	@Override
@@ -83,7 +85,13 @@ public final class ICECUBE extends PApplet {
 
 	@Override
 	public void keyPressed() {
-		if (key == CODED) {
+		if (devel != null) {
+			if (key == ENTER || key == RETURN)
+				doDevelCommand();
+			else
+				devel += key;
+		}
+		else if (key == CODED) {
 			switch(keyCode) {
 				case LEFT:  left  = true; break;
 				case RIGHT: right = true; break;
@@ -98,6 +106,7 @@ public final class ICECUBE extends PApplet {
 				case 'S': s = true; break;
 				case ' ': space = true; break;
 				case 'R': resetLevel(); break;
+				case ':': devel = ""; break;
 			}
 		}
 	}
@@ -121,6 +130,20 @@ public final class ICECUBE extends PApplet {
 				case ' ': space = false; break;
 			}
 		}
+	}
+
+	private void doDevelCommand() {
+		println("1337 HAXOR: " + devel);
+
+		if (devel.charAt(0) == '>')
+			changeLevel(devel.substring(1));
+		else {
+			switch(devel) {
+				//TODO other commands
+			}
+		}
+
+		devel = null;
 	}
 
 	@Override
