@@ -88,7 +88,7 @@ public final class Vector2  {
 	 * Scales this vector by the supplied scalar.
 	 * @return the resultant vector
 	 */
-	public Vector2 mul(double scalar) {
+	public Vector2 mul(float scalar) {
 		return new Vector2(scalar * x, scalar * y);
 	}
 
