@@ -6,6 +6,8 @@ import java.util.Map;
 
 import net.kopeph.icecube.tile.*;
 import net.kopeph.icecube.util.Rectangle;
+import net.kopeph.icecube.util.Vector2;
+import processing.core.PApplet;
 import processing.core.PGraphics;
 import processing.core.PImage;
 
@@ -104,8 +106,18 @@ public final class Level {
 
 		//TODO: consider a loop to only draw the tiles that are currently on-screen
 		//the above will be the final step in making off-screen tiles basically free in performance terms
-		for (Tile tile : tiles)
-			if (tile != null)
-				tile.draw();
+		Vector2 worldOrigin = context.origin.mul(1.0f/Tile.TILE_SIZE);
+		int minx = Math.max(0, PApplet.floor(worldOrigin.x));
+		int maxx = Math.min(width, PApplet.ceil(worldOrigin.x + context.width/Tile.TILE_SIZE));
+		int miny = Math.max(0, PApplet.floor(worldOrigin.y));
+		int maxy = Math.min(height, PApplet.ceil(worldOrigin.y + context.height/Tile.TILE_SIZE));
+
+		for (int y = miny; y < maxy; ++y) {
+			for (int x = minx; x < maxx; ++x) {
+				Tile tile = tileAt(x, y);
+				if (tile != null)
+					tile.draw();
+			}
+		}
 	}
 }

@@ -93,8 +93,8 @@ public final class Player {
 		int maxx = Math.min(context.level.width, PApplet.ceil(hb.right()));
 		int miny = Math.max(0, PApplet.floor(hb.pos.y));
 		int maxy = Math.min(context.level.height - 1, PApplet.ceil(hb.bottom()));
-		for (int x = minx; x < maxx; ++x) {
-			for (int y = miny; y <= maxy; ++y) {
+		for (int y = miny; y <= maxy; ++y) {
+			for (int x = minx; x < maxx; ++x) {
 				Tile tile = context.level.tileAt(x, y);
 				if (tile instanceof TransportTile) {
 					if (toRect().intersects(tile.toRect())) {
@@ -236,8 +236,8 @@ public final class Player {
 		int maxx = Math.min(context.level.width, PApplet.ceil(hb.right()));
 		int miny = Math.max(0, PApplet.floor(hb.pos.y));
 		int maxy = Math.min(context.level.height, PApplet.ceil(hb.bottom()));
-		for (int x = minx; x < maxx; ++x) {
-			for (int y = miny; y < maxy; ++y) {
+		for (int y = miny; y < maxy; ++y) {
+			for (int x = minx; x < maxx; ++x) {
 				Tile tile = context.level.tileAt(x, y);
 				if (tile != null && tile.hasCollision() && hb.intersects(tile.toRect()))
 					return tile.toRect();
