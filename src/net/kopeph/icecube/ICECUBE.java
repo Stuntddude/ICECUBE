@@ -19,7 +19,7 @@ public final class ICECUBE extends PApplet {
 	public Player player;
 	private Player backup; //used to neatly reset the player's position and size if they die in a level
 
-	private boolean left, right, up, down, space; //for player movement TODO: move elsewhere
+	private boolean left, right, up, down, space;
 	private boolean w, a, s, d;
 	private static ICECUBE context;
 
@@ -33,7 +33,6 @@ public final class ICECUBE extends PApplet {
 	public void setup() {
 		frameRate(60);
 		noStroke();
-		//TODO: move the origin when the screen is resized, similar to how I do it for mousewheel zoom
 		surface.setResizable(true);
 		surface.setTitle("ICECUBE         CONTROLS: A-LEFT  D-RIGHT  SPACE-JUMP  R-RESET  MOUSEWHEEL-ZOOM");
 
@@ -50,25 +49,24 @@ public final class ICECUBE extends PApplet {
 	public void changeLevel(String name) {
 		level = new Level(name);
 		levelName = name;
-		backup = player.clone();
+		backup = new Player(player);
 	}
 
 	public void resetLevel() {
-		player = backup.clone();
+		player = new Player(backup);
 	}
 
 	private static final float MAX_FOLLOW_DISTANCE = 30.0f;
-	public Vector2 originf = new Vector2(0, 0); //the top left corner of the screen in pixel coordinate (NOT world coordinates!)
+	public Vector2 originf = new Vector2(0, 0); //the top left corner of the screen in pixel coordinates (NOT world coordinates!)
 	public Vector2 origin = new Vector2(0, 0); //the origin, rounded to int to avoid weird aliasing between tiles
 
 	private void updateOrigin(Vector2 newOrigin) {
 		originf = newOrigin;
-		origin = new Vector2(originf.x, originf.y);
+		origin = new Vector2(Math.round(originf.x), Math.round(originf.y));
 	}
 
 	@Override
 	public void draw() {
-		//move player
 		player.move(left || a, right || d, up || w, down || s, space);
 
 		//update follow cam origin
@@ -76,10 +74,8 @@ public final class ICECUBE extends PApplet {
 		Vector2 playerCenter = player.toRect().center().mul(Tile.TILE_SIZE);
 		float distance = playerCenter.sub(screenCenter).mag();
 		if (distance > MAX_FOLLOW_DISTANCE)
-			originf = originf.add(Vector2.polar(distance - MAX_FOLLOW_DISTANCE, playerCenter.thetaTo(screenCenter)).mul(0.1f));
-		origin = new Vector2(Math.round(originf.x), Math.round(originf.y));
+			updateOrigin(originf.add(Vector2.polar(distance - MAX_FOLLOW_DISTANCE, playerCenter.thetaTo(screenCenter)).mul(0.1f)));
 
-		//draw everything
 		background(0xFF000000); //everything around me is black, the color of my soul
 		level.draw();
 		player.draw();
@@ -130,7 +126,7 @@ public final class ICECUBE extends PApplet {
 	@Override
 	public void mouseWheel(MouseEvent e) {
 		//find the center before the scale change and convert to world coordinates
-		Vector2 screenCenter = origin.add(new Vector2(width/2, height/2));
+		Vector2 screenCenter = originf.add(new Vector2(width/2, height/2));
 		Vector2 worldCenter = screenCenter.mul(1/Tile.TILE_SIZE);
 
 		//scale the tile size

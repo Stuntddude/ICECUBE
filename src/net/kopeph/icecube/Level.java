@@ -71,8 +71,6 @@ public final class Level {
 		bottom = new Rectangle(-width, height, width*3, height);
 		left = new Rectangle(-width, 0, width, height);
 		right = new Rectangle(width, 0, width, height);
-
-		//TODO: better level validation maybe?
 	}
 
 	/** parses a newline-separated list of door-to-level mappings in the format "x,y:name", ignoring all whitespace */
@@ -104,8 +102,6 @@ public final class Level {
 		context.fill(0xFFAAAAAA); //a neutral grey
 		context.rect(-context.origin.x, -context.origin.y, width*Tile.TILE_SIZE, height*Tile.TILE_SIZE);
 
-		//TODO: consider a loop to only draw the tiles that are currently on-screen
-		//the above will be the final step in making off-screen tiles basically free in performance terms
 		Vector2 worldOrigin = context.origin.mul(1.0f/Tile.TILE_SIZE);
 		int minx = Math.max(0, PApplet.floor(worldOrigin.x));
 		int maxx = Math.min(width, PApplet.ceil(worldOrigin.x + context.width/Tile.TILE_SIZE));

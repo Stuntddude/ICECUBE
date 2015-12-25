@@ -34,7 +34,6 @@ public class Tile {
 
 	//this should be overridden for anything planning to be non-square!
 	//like ramps and buttons and shit
-	//if hasAnimation() is not overridden, there's currently no reason to override this funciton
 	public void draw() {
 		context.fill(color);
 		context.rect(pos.x*TILE_SIZE - context.origin.x, pos.y*TILE_SIZE - context.origin.y, TILE_SIZE, TILE_SIZE);

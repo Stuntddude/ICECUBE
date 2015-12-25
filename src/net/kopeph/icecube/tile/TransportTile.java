@@ -15,5 +15,4 @@ public class TransportTile extends Tile {
 		super(x, y, color);
 		level = levelName;
 	}
-
 }

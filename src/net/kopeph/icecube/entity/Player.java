@@ -13,11 +13,10 @@ public final class Player {
 	private int color = 0xFFFFFFFF; //white
 	private boolean dead = false;
 
-	//used internally by clone()
-	private Player(Vector2 pos, Vector2 size, Vector2 vel) {
-		this.pos = pos;
-		this.size = size;
-		this.vel = vel;
+	public Player(Player other) {
+		pos = other.pos;
+		size = other.size;
+		vel = other.vel;
 	}
 
 	public Player(Vector2 pos, Vector2 size) {
@@ -42,11 +41,6 @@ public final class Player {
 		moveTo(new Vector2(x, y));
 	}
 
-	@Override
-	public Player clone() {
-		return new Player(pos, size, vel);
-	}
-
 	private static final float SP = 0.15f;
 	private static final float GRAVITY = 0.02f;
 
@@ -62,8 +56,8 @@ public final class Player {
 		}
 
 		Vector2 offset = new Vector2(0, 0);
-		if (left)  offset = offset.add(new Vector2(-SP, 0)); //-0.001f));
-		if (right) offset = offset.add(new Vector2( SP, 0)); //-0.001f));
+		if (left)  offset = offset.add(new Vector2(-SP, 0));
+		if (right) offset = offset.add(new Vector2( SP, 0));
 		//I'm adding small y-offset to the movement so the player doesn't get stuck on the ground
 		//this is DUCT TAPE! once the jam is over, the actual problem needs to be diagnosed and addressed
 		if ((left || right) && onFloor) pos = pos.add(new Vector2(0, -0.00001f));
@@ -97,12 +91,12 @@ public final class Player {
 			for (int x = minx; x < maxx; ++x) {
 				Tile tile = context.level.tileAt(x, y);
 				if (tile instanceof TransportTile) {
-					if (toRect().intersects(tile.toRect())) {
+					if (hb.intersects(tile.toRect())) {
 						context.changeLevel(((TransportTile)tile).level);
 						return;
 					}
 				} else if (tile instanceof SizePad) {
-					if (toRect().intersects(tile.toRect().move(new Vector2(0, -0.5f)))) {
+					if (hb.intersects(tile.toRect().move(new Vector2(0, -0.5f)))) {
 						if (tile instanceof BluePad) {
 							shouldGrow = true;
 							//XXX: MORE DUCT TAPE
@@ -112,7 +106,7 @@ public final class Player {
 						}
 					}
 				} else if (tile instanceof Spring) {
-					if (toRect().intersects(tile.toRect())) {
+					if (hb.intersects(tile.toRect())) {
 						boing = true;
 					}
 				}
