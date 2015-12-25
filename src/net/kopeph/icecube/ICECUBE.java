@@ -23,15 +23,18 @@ public final class ICECUBE extends PApplet {
 	private static ICECUBE context;
 
 	@Override
-	public void setup() {
+	public void settings() {
 		context = this;
-
 		size(1024, 768);
+	}
+
+	@Override
+	public void setup() {
 		frameRate(60);
 		noStroke();
 		//TODO: move the origin when the screen is resized, similar to how I do it for mousewheel zoom
-		frame.setResizable(true);
-		frame.setTitle("ICECUBE         CONTROLS: A-LEFT  D-RIGHT  SPACE-JUMP  R-RESET  MOUSEWHEEL-ZOOM");
+		surface.setResizable(true);
+		surface.setTitle("ICECUBE         CONTROLS: A-LEFT  D-RIGHT  SPACE-JUMP  R-RESET  MOUSEWHEEL-ZOOM");
 
 		player = new Player(0, 0, 1, 1);
 		changeLevel("menu");
