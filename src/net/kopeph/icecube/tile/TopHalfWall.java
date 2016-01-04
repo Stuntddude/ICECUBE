@@ -20,7 +20,7 @@ public final class TopHalfWall extends Tile {
 	}
 
 	@Override
-	public Rectangle toRect() {
+	public Rectangle getHitbox() {
 		return new Rectangle(pos.x, pos.y, 1.0f, 0.5f);
 	}
 

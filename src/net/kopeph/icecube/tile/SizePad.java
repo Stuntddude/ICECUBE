@@ -3,7 +3,7 @@ package net.kopeph.icecube.tile;
 import net.kopeph.icecube.util.Vector2;
 
 /** common superclass of RedTile and BlueTile */
-public class SizePad extends Tile {
+public abstract class SizePad extends Tile {
 	public SizePad(Vector2 pos, int color) {
 		super(pos, color);
 	}

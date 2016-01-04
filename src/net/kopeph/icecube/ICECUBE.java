@@ -71,7 +71,7 @@ public final class ICECUBE extends PApplet {
 
 		//update follow cam origin
 		Vector2 screenCenter = originf.add(new Vector2(width/2, height/2));
-		Vector2 playerCenter = player.toRect().center().mul(Tile.TILE_SIZE);
+		Vector2 playerCenter = player.getHitbox().center().mul(Tile.TILE_SIZE);
 		float distance = playerCenter.sub(screenCenter).mag();
 		if (distance > MAX_FOLLOW_DISTANCE)
 			updateOrigin(originf.add(Vector2.polar(distance - MAX_FOLLOW_DISTANCE, playerCenter.thetaTo(screenCenter)).mul(0.1f)));

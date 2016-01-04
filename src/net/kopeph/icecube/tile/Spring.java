@@ -3,7 +3,7 @@ package net.kopeph.icecube.tile;
 import net.kopeph.icecube.util.Rectangle;
 import net.kopeph.icecube.util.Vector2;
 
-public class Spring extends Tile {
+public final class Spring extends Tile {
 	private static final int COLOR = 0xFFFF8000; //orange
 
 	public Spring(Vector2 pos) {
@@ -15,7 +15,7 @@ public class Spring extends Tile {
 	}
 
 	@Override
-	public Rectangle toRect() {
+	public Rectangle getHitbox() {
 		//XXX: wet code smell
 		int x = Math.round(pos.x), y = Math.round(pos.y);
 		boolean neighborLeft = context.level.tileAt(x - 1, y) instanceof Spring;

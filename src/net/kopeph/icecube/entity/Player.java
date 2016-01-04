@@ -29,7 +29,7 @@ public final class Player {
 		this(new Vector2(x, y), new Vector2(w, h));
 	}
 
-	public Rectangle toRect() {
+	public Rectangle getHitbox() {
 		return new Rectangle(pos, size.sub(new Vector2(BREATHING_ROOM, BREATHING_ROOM)));
 	}
 
@@ -82,7 +82,7 @@ public final class Player {
 
 		//handle interaction with interactive tiles in the level
 		//only loop through tiles near the player, for efficiency
-		Rectangle hb = toRect();
+		Rectangle hb = getHitbox();
 		int minx = Math.max(0, PApplet.floor(hb.pos.x));
 		int maxx = Math.min(context.level.width, PApplet.ceil(hb.right()));
 		int miny = Math.max(0, PApplet.floor(hb.pos.y));
@@ -91,12 +91,12 @@ public final class Player {
 			for (int x = minx; x < maxx; ++x) {
 				Tile tile = context.level.tileAt(x, y);
 				if (tile instanceof TransportTile) {
-					if (hb.intersects(tile.toRect())) {
+					if (hb.intersects(tile.getHitbox())) {
 						context.changeLevel(((TransportTile)tile).level);
 						return;
 					}
 				} else if (tile instanceof SizePad) {
-					if (hb.intersects(tile.toRect().move(new Vector2(0, -0.5f)))) {
+					if (hb.intersects(tile.getHitbox().move(new Vector2(0, -0.5f)))) {
 						if (tile instanceof BluePad) {
 							shouldGrow = true;
 							//XXX: MORE DUCT TAPE
@@ -106,7 +106,7 @@ public final class Player {
 						}
 					}
 				} else if (tile instanceof Spring) {
-					if (hb.intersects(tile.toRect())) {
+					if (hb.intersects(tile.getHitbox())) {
 						boing = true;
 					}
 				}
@@ -154,7 +154,7 @@ public final class Player {
 
 	private boolean growImpl(float xcomp) {
 		Rectangle hb = new Rectangle(pos.sub(new Vector2(xcomp, GROWTH)),
-				 					 toRect().dim.add(new Vector2(GROWTH, GROWTH)));
+				 					 getHitbox().dim.add(new Vector2(GROWTH, GROWTH)));
 		return findIntersection(hb) == null;
 	}
 
@@ -205,7 +205,7 @@ public final class Player {
 	private Vector2 moveWithCollisionImpl(Vector2 offset) {
 		Rectangle collision = null;
 		do { //handle collisions until the player is free from all tiles
-			collision = findIntersection(toRect().move(offset));
+			collision = findIntersection(getHitbox().move(offset));
 			if (collision != null)
 				offset = eject(collision, offset);
 		} while (collision != null);
@@ -233,8 +233,8 @@ public final class Player {
 		for (int y = miny; y < maxy; ++y) {
 			for (int x = minx; x < maxx; ++x) {
 				Tile tile = context.level.tileAt(x, y);
-				if (tile != null && tile.hasCollision() && hb.intersects(tile.toRect()))
-					return tile.toRect();
+				if (tile != null && tile.hasCollision() && hb.intersects(tile.getHitbox()))
+					return tile.getHitbox();
 			}
 		}
 		return null;
@@ -246,7 +246,7 @@ public final class Player {
 			ICECUBE.println("NaN IN THE DUNGEON! THERE'S A NaN IN THE DUNGEON! Just thought you ought to know...");
 
 		//the projected position after offset, to test for intersections
-		Rectangle hb = toRect().move(offset);
+		Rectangle hb = getHitbox().move(offset);
 
 		//find the shortest path to backtrack that gets the player to where they're not colliding
 		//the minimum distance straight along x or y axis the player must be ejected to exit collision
