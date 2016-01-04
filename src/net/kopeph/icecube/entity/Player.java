@@ -12,6 +12,7 @@ public final class Player {
 	private Vector2 pos, size, vel;
 	private int color = 0xFFFFFFFF; //white
 	private boolean dead = false;
+	private int deathFrame = 0; //used to drive the death animation; incremented every frame upon death
 
 	public Player(Player other) {
 		pos = other.pos;
@@ -50,8 +51,6 @@ public final class Player {
 			//TODO: death animation
 			if (context.levelName.equals("end"))
 				context.exit();
-			else
-				context.resetLevel();
 			return;
 		}
 
@@ -128,8 +127,10 @@ public final class Player {
 		Vector2 deltap = pos.sub(oldPos);
 		vel = new Vector2(0, deltap.y);
 
-		if (size.x <= 0.0f)
+		if (size.x <= 0.0f) {
 			dead = true;
+			deathFrame = 0;
+		}
 
 		//PApplet.println("player: " + pos + "\tvelocity: " + vel + "\tsize: " + size + "\t" + offset); //DEBUG
 	}
@@ -271,5 +272,36 @@ public final class Player {
 	public void draw() {
 		context.fill(color);
 		context.rect(pos.x*Tile.TILE_SIZE - context.origin.x, pos.y*Tile.TILE_SIZE - context.origin.y, size.x*Tile.TILE_SIZE, size.y*Tile.TILE_SIZE);
+
+		//TODO: extract to generic animations system
+		if (dead) {
+			//cosine is used here to provide a smooth easing for the animation, not for any trigonometric purpose
+			float start = PApplet.cos(PApplet.constrain(deathFrame/24.0f       , 0.0f, 1.0f)*PApplet.PI)*0.5f - 0.5f; //XXX: magic framerate-dependent constant
+			float end   = PApplet.cos(PApplet.constrain(deathFrame/24.0f - 0.5f, 0.0f, 1.0f)*PApplet.PI)*0.5f - 0.5f; //XXX: magic framerate-dependent constant
+
+			//setup style for line-drawing
+			context.stroke(0xFFFFFFFF); //white
+			context.strokeWeight(Tile.TILE_SIZE/8.0f); //XXX: magic constant
+			context.strokeCap(PApplet.SQUARE);
+
+			//use <s>the force</s> trigonometry to draw the line radially 6 times
+			for (int i = 0; i < 6; ++i) {
+				float sx = PApplet.sin(PApplet.PI*i/3.0f) * start;
+				float sy = PApplet.cos(PApplet.PI*i/3.0f) * start;
+				float ex = PApplet.sin(PApplet.PI*i/3.0f) * end;
+				float ey = PApplet.cos(PApplet.PI*i/3.0f) * end;
+
+				context.line((pos.x + sx)*Tile.TILE_SIZE - context.origin.x, (pos.y + sy)*Tile.TILE_SIZE - context.origin.y,
+							 (pos.x + ex)*Tile.TILE_SIZE - context.origin.x, (pos.y + ey)*Tile.TILE_SIZE - context.origin.y);
+			}
+
+			//reset style for rect-drawing
+			context.noStroke();
+
+			if (deathFrame > 36) //XXX: magic framerate-dependent constant
+				context.resetLevel();
+
+			++deathFrame;
+		}
 	}
 }
