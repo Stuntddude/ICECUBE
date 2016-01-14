@@ -6,8 +6,7 @@ import net.kopeph.icecube.util.Vector2;
 
 /** The common superclass of all tiles in the game. */
 public abstract class Tile {
-	public static float REAL_TILE_SIZE = 24;
-	public static float TILE_SIZE = 24; //REAL_TILE_SIZE rounded to the nearest int
+	public static float TILE_SIZE = 24;
 
 	protected final ICECUBE context = ICECUBE.getContext();
 
