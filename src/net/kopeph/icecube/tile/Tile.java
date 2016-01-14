@@ -3,6 +3,7 @@ package net.kopeph.icecube.tile;
 import net.kopeph.icecube.ICECUBE;
 import net.kopeph.icecube.util.Rectangle;
 import net.kopeph.icecube.util.Vector2;
+import processing.core.PApplet;
 
 /** The common superclass of all tiles in the game. */
 public abstract class Tile {
@@ -33,9 +34,19 @@ public abstract class Tile {
 	}
 
 	//this should be overridden for anything planning to be non-square!
-	//like ramps and buttons and shit
+	//like half-tiles and springs and shit
 	public void draw() {
+		float x = PApplet.round(pos.x*REAL_TILE_SIZE - context.originf.x);
+		float y = PApplet.round(pos.y*REAL_TILE_SIZE - context.originf.y);
+		float w = PApplet.round(pos.x*REAL_TILE_SIZE + REAL_TILE_SIZE - context.originf.x) - x;
+		float h = PApplet.round(pos.y*REAL_TILE_SIZE + REAL_TILE_SIZE - context.originf.y) - y;
+		draw(x, y, w, h);
+	}
+
+	//this should be overridden by anything planning to not be an actual solid-color square
+	//including size tiles and goal tiles
+	protected void draw(float x, float y, float w, float h) {
 		context.fill(color);
-		context.rect(pos.x*TILE_SIZE - context.origin.x, pos.y*TILE_SIZE - context.origin.y, TILE_SIZE, TILE_SIZE);
+		context.rect(x, y, w, h);
 	}
 }

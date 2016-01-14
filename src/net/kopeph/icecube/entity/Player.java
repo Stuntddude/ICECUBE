@@ -270,8 +270,13 @@ public final class Player {
 	}
 
 	public void draw() {
+		float x = pos.x*Tile.REAL_TILE_SIZE - context.originf.x;
+		float y = pos.y*Tile.REAL_TILE_SIZE - context.originf.y;
+		float w = pos.x*Tile.REAL_TILE_SIZE + size.x*Tile.REAL_TILE_SIZE - context.originf.x - x;
+		float h = pos.y*Tile.REAL_TILE_SIZE + size.y*Tile.REAL_TILE_SIZE - context.originf.y - y;
+
 		context.fill(color);
-		context.rect(pos.x*Tile.TILE_SIZE - context.origin.x, pos.y*Tile.TILE_SIZE - context.origin.y, size.x*Tile.TILE_SIZE, size.y*Tile.TILE_SIZE);
+		context.rect(x, y, w, h);
 
 		//TODO: extract to generic animations system
 		if (dead) {
@@ -281,7 +286,7 @@ public final class Player {
 
 			//setup style for line-drawing
 			context.stroke(0xFFFFFFFF); //white
-			context.strokeWeight(Tile.TILE_SIZE/8.0f); //XXX: magic constant
+			context.strokeWeight(Tile.REAL_TILE_SIZE/8.0f); //XXX: magic constant
 			context.strokeCap(PApplet.SQUARE);
 
 			//use <s>the force</s> trigonometry to draw the line radially 6 times
@@ -291,8 +296,8 @@ public final class Player {
 				float ex = PApplet.sin(PApplet.PI*i/3.0f) * end;
 				float ey = PApplet.cos(PApplet.PI*i/3.0f) * end;
 
-				context.line((pos.x + sx)*Tile.TILE_SIZE - context.origin.x, (pos.y + sy)*Tile.TILE_SIZE - context.origin.y,
-							 (pos.x + ex)*Tile.TILE_SIZE - context.origin.x, (pos.y + ey)*Tile.TILE_SIZE - context.origin.y);
+				context.line((pos.x + sx)*Tile.REAL_TILE_SIZE - context.originf.x, (pos.y + sy)*Tile.REAL_TILE_SIZE - context.originf.y,
+							 (pos.x + ex)*Tile.REAL_TILE_SIZE - context.originf.x, (pos.y + ey)*Tile.REAL_TILE_SIZE - context.originf.y);
 			}
 
 			//reset style for rect-drawing

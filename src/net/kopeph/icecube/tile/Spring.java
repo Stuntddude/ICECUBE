@@ -32,15 +32,15 @@ public final class Spring extends Tile {
 	}
 
 	@Override
-	public void draw() {
+	public void draw(float x, float y, float w, float h) {
 		context.fill(color);
 
-		int x = Math.round(pos.x), y = Math.round(pos.y);
-		boolean neighborLeft = context.level.tileAt(x - 1, y) instanceof Spring;
-		boolean neighborRight = context.level.tileAt(x + 1, y) instanceof Spring;
+		int wx = Math.round(pos.x), wy = Math.round(pos.y);
+		boolean neighborLeft = context.level.tileAt(wx - 1, wy) instanceof Spring;
+		boolean neighborRight = context.level.tileAt(wx + 1, wy) instanceof Spring;
 
 		//draw the spring into the bottom 1/4 of the tile, rounding top corners where applicable
-		context.rect(pos.x*TILE_SIZE - context.origin.x, pos.y*TILE_SIZE + TILE_SIZE*3/4 - context.origin.y, TILE_SIZE, TILE_SIZE/4,
-					 neighborLeft? 0 : TILE_SIZE, neighborRight? 0 : TILE_SIZE, 0, 0);
+		context.rect(x, y + w*3/4, w, h/4,
+					 neighborLeft? 0 : w, neighborRight? 0 : w, 0, 0);
 	}
 }

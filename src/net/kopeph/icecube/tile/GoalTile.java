@@ -14,11 +14,8 @@ public final class GoalTile extends TransportTile {
 	}
 
 	@Override
-	public void draw() {
+	public void draw(float x, float y, float w, float h) {
 		context.fill(color); //draws a square at 45 deg
-		context.quad(pos.x*TILE_SIZE + TILE_SIZE/2 - context.origin.x, pos.y*TILE_SIZE               - context.origin.y,
-					 pos.x*TILE_SIZE + TILE_SIZE   - context.origin.x, pos.y*TILE_SIZE + TILE_SIZE/2 - context.origin.y,
-					 pos.x*TILE_SIZE + TILE_SIZE/2 - context.origin.x, pos.y*TILE_SIZE + TILE_SIZE   - context.origin.y,
-					 pos.x*TILE_SIZE               - context.origin.x, pos.y*TILE_SIZE + TILE_SIZE/2 - context.origin.y);
+		context.quad(x + w/2, y, x + w, y + h/2, x + w/2, y + h, x, y + h/2);
 	}
 }

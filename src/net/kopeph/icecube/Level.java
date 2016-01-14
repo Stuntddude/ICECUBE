@@ -100,13 +100,13 @@ public final class Level {
 
 	public void draw() {
 		context.fill(0xFFAAAAAA); //a neutral grey
-		context.rect(-context.origin.x, -context.origin.y, width*Tile.TILE_SIZE, height*Tile.TILE_SIZE);
+		context.rect(PApplet.round(-context.originf.x), PApplet.round(-context.originf.y), PApplet.floor(width*Tile.REAL_TILE_SIZE), PApplet.floor(height*Tile.REAL_TILE_SIZE));
 
-		Vector2 worldOrigin = context.origin.mul(1.0f/Tile.TILE_SIZE);
+		Vector2 worldOrigin = context.originf.mul(1.0f/Tile.REAL_TILE_SIZE);
 		int minx = Math.max(0, PApplet.floor(worldOrigin.x));
-		int maxx = Math.min(width, PApplet.ceil(worldOrigin.x + context.width/Tile.TILE_SIZE));
+		int maxx = Math.min(width, PApplet.ceil(worldOrigin.x + context.width/Tile.REAL_TILE_SIZE));
 		int miny = Math.max(0, PApplet.floor(worldOrigin.y));
-		int maxy = Math.min(height, PApplet.ceil(worldOrigin.y + context.height/Tile.TILE_SIZE));
+		int maxy = Math.min(height, PApplet.ceil(worldOrigin.y + context.height/Tile.REAL_TILE_SIZE));
 
 		for (int y = miny; y < maxy; ++y) {
 			for (int x = minx; x < maxx; ++x) {

@@ -71,7 +71,7 @@ public final class ICECUBE extends PApplet {
 
 		//update follow cam origin
 		Vector2 screenCenter = originf.add(new Vector2(width/2, height/2));
-		Vector2 playerCenter = player.getHitbox().center().mul(Tile.TILE_SIZE);
+		Vector2 playerCenter = player.getHitbox().center().mul(Tile.REAL_TILE_SIZE);
 		float distance = playerCenter.sub(screenCenter).mag();
 		if (distance > MAX_FOLLOW_DISTANCE)
 			updateOrigin(originf.add(Vector2.polar(distance - MAX_FOLLOW_DISTANCE, playerCenter.thetaTo(screenCenter)).mul(0.1f)));
@@ -127,14 +127,14 @@ public final class ICECUBE extends PApplet {
 	public void mouseWheel(MouseEvent e) {
 		//find the center before the scale change and convert to world coordinates
 		Vector2 screenCenter = originf.add(new Vector2(width/2, height/2));
-		Vector2 worldCenter = screenCenter.mul(1/Tile.TILE_SIZE);
+		Vector2 worldCenter = screenCenter.mul(1/Tile.REAL_TILE_SIZE);
 
-		//scale the tile size
-		Tile.REAL_TILE_SIZE *= pow(1.1f, -e.getCount());
+		//scale by 2^(1/n) where n is the number if scale increments between each power-of-two zoom level
+		Tile.REAL_TILE_SIZE *= pow(pow(2.0f, 0.25f), -e.getCount());
 		Tile.TILE_SIZE = Math.max(1, Math.round(Tile.REAL_TILE_SIZE));
 
 		//use the world center from before and convert back into screen coords using the new tile size
-		Vector2 newScreenCenter = worldCenter.mul(Tile.TILE_SIZE);
+		Vector2 newScreenCenter = worldCenter.mul(Tile.REAL_TILE_SIZE);
 		Vector2 newScreenOrigin = newScreenCenter.sub(new Vector2(width/2, height/2));
 
 		//update the real origin

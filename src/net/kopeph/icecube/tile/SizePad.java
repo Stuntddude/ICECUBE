@@ -18,18 +18,18 @@ public abstract class SizePad extends Tile {
 	}
 
 	@Override
-	public void draw() {
+	public void draw(float x, float y, float w, float h) {
 		context.fill(0xFF000000); //black
-		context.rect(pos.x*TILE_SIZE - context.origin.x, pos.y*TILE_SIZE - context.origin.y, TILE_SIZE, TILE_SIZE);
+		context.rect(x, y, w, h);
 
 		//draws a half height tile
 		context.fill(color);
-		int x = Math.round(pos.x), y = Math.round(pos.y);
-		boolean neighborLeft = context.level.tileAt(x - 1, y) instanceof SizePad;
-		boolean neighborRight = context.level.tileAt(x + 1, y) instanceof SizePad;
+		int wx = Math.round(pos.x), wy = Math.round(pos.y);
+		boolean neighborLeft = context.level.tileAt(wx - 1, wy) instanceof SizePad;
+		boolean neighborRight = context.level.tileAt(wx + 1, wy) instanceof SizePad;
 
 		//draw the pad into the top half of the tile, rounding bottom corners where applicable
-		context.rect(pos.x*TILE_SIZE - context.origin.x, pos.y*TILE_SIZE - context.origin.y, TILE_SIZE, TILE_SIZE/2,
-					 0, 0, neighborRight? 0 : TILE_SIZE, neighborLeft? 0 : TILE_SIZE);
+		context.rect(x, y, w, h/2,
+					 0, 0, neighborRight? 0 : h/4, neighborLeft? 0 : h/4);
 	}
 }
