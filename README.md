@@ -12,7 +12,7 @@ Building Directions (Eclipse Java 8)
   1. *Project Settings > Java Compiler > Compiler Compliance Level*: `1.8`
   2. *Project Settings > Java Build Path > Libraries* Remove any existing libraries
   3. *Project Settings > Java Build Path > Libraries > Add Library > JRE System* choose jdk1.8
-4. **Add all [Processing core libraries](http://stuntddude.github.io/ICECUBE/3rd-party/processing_core-3.0.1.jar)** to the class path
+4. **Add all [Processing core libraries](https://github.com/Stuntddude/ICECUBE/blob/gh-pages/3rd-party/processing-3.0.1-libs.zip)** to the class path
 5. Configure `jogl-all.jar` and `gluegen-rt.jar`
   1. *Project Settings > Java Build Path > Libraries > `jogl-all.jar` > Native library location* point to the folder containing the native jars
   2. *Project Settings > Java Build Path > Libraries > `gluegen-rt.jar` > Native library location* point to the folder containing the native jars
