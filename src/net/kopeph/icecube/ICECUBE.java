@@ -16,13 +16,14 @@ import processing.event.MouseEvent;
  * without needing to adjust the physics step, because world coordinates are in no way based on pixel scale
  */
 public final class ICECUBE extends PApplet {
+	public static final ICECUBE game = new ICECUBE();
+
 	public Level level;
 	public Player player;
 	private Player backup; //used to neatly reset the player's position and size if they die in a level
 
 	private boolean left, right, up, down, space;
 	private boolean w, a, s, d;
-	private static ICECUBE context;
 
 	private final Menu mainMenu = new Menu();
 
@@ -34,7 +35,6 @@ public final class ICECUBE extends PApplet {
 
 	@Override
 	public void settings() {
-		context = this;
 		size(1024, 768, P3D);
 		smooth(8);
 	}
@@ -48,10 +48,6 @@ public final class ICECUBE extends PApplet {
 
 		player = new Player(0, 0, 1, 1);
 		changeLevel("menu");
-	}
-
-	public static ICECUBE getContext() {
-		return context;
 	}
 
 	public String levelName;
@@ -158,6 +154,6 @@ public final class ICECUBE extends PApplet {
 	}
 
 	public static void main(String[] args) {
-		PApplet.main(ICECUBE.class.getName());
+		PApplet.runSketch(new String[] { ICECUBE.class.getName() }, game);
 	}
 }

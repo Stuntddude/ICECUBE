@@ -12,7 +12,7 @@ import processing.core.PGraphics;
 import processing.core.PImage;
 
 public final class Level {
-	private final ICECUBE context = ICECUBE.getContext();
+	private final ICECUBE game = ICECUBE.game;
 	PGraphics canvas;
 
 	public final int width, height;
@@ -25,8 +25,8 @@ public final class Level {
 	public final Rectangle right;
 
 	public Level(String levelName) {
-		PImage img = context.loadImage("res/" + levelName + ".png");
-		Map<Point, String> doors = parseMeta(context.loadStrings("res/" + levelName + ".txt"));
+		PImage img = game.loadImage("res/" + levelName + ".png");
+		Map<Point, String> doors = parseMeta(game.loadStrings("res/" + levelName + ".txt"));
 
 		width = img.width;
 		height = img.height;
@@ -60,7 +60,7 @@ public final class Level {
 						break;
 					case 0xFFFF00FF:
 						//XXX: player may end up inside a wall if there is no magenta pixel in level
-						context.player.moveTo(x + 0.5f, y + 0.5f);
+						game.player.moveTo(x + 0.5f, y + 0.5f);
 						break;
 				}
 			}
@@ -83,8 +83,8 @@ public final class Level {
 			String[] pair = line.split(":");
 			String[] coords = pair[0].split(",");
 			doors.put(new Point(Integer.parseInt(coords[0].trim()),
-								Integer.parseInt(coords[1].trim())),
-					  pair[1].trim());
+			                    Integer.parseInt(coords[1].trim())),
+			          pair[1].trim());
 		}
 
 		return doors;
@@ -99,14 +99,14 @@ public final class Level {
 	}
 
 	public void draw() {
-		context.fill(0xFFAAAAAA); //a neutral grey
-		context.rect(-context.origin.x, -context.origin.y, width*Tile.TILE_SIZE, height*Tile.TILE_SIZE);
+		game.fill(0xFFAAAAAA); //a neutral grey
+		game.rect(-game.origin.x, -game.origin.y, width*Tile.TILE_SIZE, height*Tile.TILE_SIZE);
 
-		Vector2 worldOrigin = context.origin.mul(1.0f/Tile.TILE_SIZE);
+		Vector2 worldOrigin = game.origin.mul(1.0f/Tile.TILE_SIZE);
 		int minx = Math.max(0, PApplet.floor(worldOrigin.x));
-		int maxx = Math.min(width, PApplet.ceil(worldOrigin.x + context.width/Tile.TILE_SIZE));
+		int maxx = Math.min(width, PApplet.ceil(worldOrigin.x + game.width/Tile.TILE_SIZE));
 		int miny = Math.max(0, PApplet.floor(worldOrigin.y));
-		int maxy = Math.min(height, PApplet.ceil(worldOrigin.y + context.height/Tile.TILE_SIZE));
+		int maxy = Math.min(height, PApplet.ceil(worldOrigin.y + game.height/Tile.TILE_SIZE));
 
 		for (int y = miny; y < maxy; ++y) {
 			for (int x = minx; x < maxx; ++x) {

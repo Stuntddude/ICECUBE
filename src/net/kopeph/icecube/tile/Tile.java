@@ -8,7 +8,7 @@ import net.kopeph.icecube.util.Vector2;
 public abstract class Tile {
 	public static float TILE_SIZE = 24;
 
-	protected final ICECUBE context = ICECUBE.getContext();
+	protected final ICECUBE game = ICECUBE.game;
 
 	public final Vector2 pos;
 	public final int color;
@@ -34,7 +34,7 @@ public abstract class Tile {
 	//this should be overridden for anything planning to be non-square!
 	//like ramps and buttons and shit
 	public void draw() {
-		context.fill(color);
-		context.rect(pos.x*TILE_SIZE - context.origin.x, pos.y*TILE_SIZE - context.origin.y, TILE_SIZE, TILE_SIZE);
+		game.fill(color);
+		game.rect(pos.x*TILE_SIZE - game.origin.x, pos.y*TILE_SIZE - game.origin.y, TILE_SIZE, TILE_SIZE);
 	}
 }

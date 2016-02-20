@@ -10,6 +10,6 @@ public class Menu {
 
 	public void draw() {
 		//TODO: placeholder
-		ICECUBE.getContext().background(0xCCAACC);
+		ICECUBE.game.background(0xCCAACC);
 	}
 }

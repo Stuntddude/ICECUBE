@@ -7,7 +7,7 @@ import net.kopeph.icecube.util.Vector2;
 import processing.core.PApplet;
 
 public final class Player {
-	private final ICECUBE context = ICECUBE.getContext();
+	private final ICECUBE game = ICECUBE.game;
 
 	private Vector2 pos, size, vel;
 	private int color = 0xFFFFFFFF; //white
@@ -49,8 +49,8 @@ public final class Player {
 		//handle death by blipping out of existence
 		if (dead) {
 			//TODO: death animation
-			if (context.levelName.equals("end"))
-				context.exit();
+			if (game.levelName.equals("end"))
+				game.exit();
 			return;
 		}
 
@@ -83,15 +83,15 @@ public final class Player {
 		//only loop through tiles near the player, for efficiency
 		Rectangle hb = getHitbox();
 		int minx = Math.max(0, PApplet.floor(hb.pos.x));
-		int maxx = Math.min(context.level.width, PApplet.ceil(hb.right()));
+		int maxx = Math.min(game.level.width, PApplet.ceil(hb.right()));
 		int miny = Math.max(0, PApplet.floor(hb.pos.y));
-		int maxy = Math.min(context.level.height - 1, PApplet.ceil(hb.bottom()));
+		int maxy = Math.min(game.level.height - 1, PApplet.ceil(hb.bottom()));
 		for (int y = miny; y <= maxy; ++y) {
 			for (int x = minx; x < maxx; ++x) {
-				Tile tile = context.level.tileAt(x, y);
+				Tile tile = game.level.tileAt(x, y);
 				if (tile instanceof TransportTile) {
 					if (hb.intersects(tile.getHitbox())) {
-						context.changeLevel(((TransportTile)tile).level);
+						game.changeLevel(((TransportTile)tile).level);
 						return;
 					}
 				} else if (tile instanceof SizePad) {
@@ -217,23 +217,23 @@ public final class Player {
 
 	private Rectangle findIntersection(Rectangle hb) {
 		//check for collision with the level borders as well as with tiles within the level
-		if (hb.intersects(context.level.top))
-			return context.level.top;
-		if (hb.intersects(context.level.bottom))
-			return context.level.bottom;
-		if (hb.intersects(context.level.left))
-			return context.level.left;
-		if (hb.intersects(context.level.right))
-			return context.level.right;
+		if (hb.intersects(game.level.top))
+			return game.level.top;
+		if (hb.intersects(game.level.bottom))
+			return game.level.bottom;
+		if (hb.intersects(game.level.left))
+			return game.level.left;
+		if (hb.intersects(game.level.right))
+			return game.level.right;
 
 		//only loop through tiles near the player, for efficiency
 		int minx = Math.max(0, PApplet.floor(hb.pos.x));
-		int maxx = Math.min(context.level.width, PApplet.ceil(hb.right()));
+		int maxx = Math.min(game.level.width, PApplet.ceil(hb.right()));
 		int miny = Math.max(0, PApplet.floor(hb.pos.y));
-		int maxy = Math.min(context.level.height, PApplet.ceil(hb.bottom()));
+		int maxy = Math.min(game.level.height, PApplet.ceil(hb.bottom()));
 		for (int y = miny; y < maxy; ++y) {
 			for (int x = minx; x < maxx; ++x) {
-				Tile tile = context.level.tileAt(x, y);
+				Tile tile = game.level.tileAt(x, y);
 				if (tile != null && tile.hasCollision() && hb.intersects(tile.getHitbox()))
 					return tile.getHitbox();
 			}
@@ -270,8 +270,8 @@ public final class Player {
 	}
 
 	public void draw() {
-		context.fill(color);
-		context.rect(pos.x*Tile.TILE_SIZE - context.origin.x, pos.y*Tile.TILE_SIZE - context.origin.y, size.x*Tile.TILE_SIZE, size.y*Tile.TILE_SIZE);
+		game.fill(color);
+		game.rect(pos.x*Tile.TILE_SIZE - game.origin.x, pos.y*Tile.TILE_SIZE - game.origin.y, size.x*Tile.TILE_SIZE, size.y*Tile.TILE_SIZE);
 
 		//TODO: extract to generic animations system
 		if (dead) {
@@ -280,9 +280,9 @@ public final class Player {
 			float end   = PApplet.cos(PApplet.constrain(deathFrame/24.0f - 0.5f, 0.0f, 1.0f)*PApplet.PI)*0.5f - 0.5f; //XXX: magic framerate-dependent constant
 
 			//setup style for line-drawing
-			context.stroke(0xFFFFFFFF); //white
-			context.strokeWeight(Tile.TILE_SIZE/8.0f); //XXX: magic constant
-			context.strokeCap(PApplet.SQUARE);
+			game.stroke(0xFFFFFFFF); //white
+			game.strokeWeight(Tile.TILE_SIZE/8.0f); //XXX: magic constant
+			game.strokeCap(PApplet.SQUARE);
 
 			//use <s>the force</s> trigonometry to draw the line radially 6 times
 			for (int i = 0; i < 6; ++i) {
@@ -291,15 +291,15 @@ public final class Player {
 				float ex = PApplet.sin(PApplet.PI*i/3.0f) * end;
 				float ey = PApplet.cos(PApplet.PI*i/3.0f) * end;
 
-				context.line((pos.x + sx)*Tile.TILE_SIZE - context.origin.x, (pos.y + sy)*Tile.TILE_SIZE - context.origin.y,
-							 (pos.x + ex)*Tile.TILE_SIZE - context.origin.x, (pos.y + ey)*Tile.TILE_SIZE - context.origin.y);
+				game.line((pos.x + sx)*Tile.TILE_SIZE - game.origin.x, (pos.y + sy)*Tile.TILE_SIZE - game.origin.y,
+				          (pos.x + ex)*Tile.TILE_SIZE - game.origin.x, (pos.y + ey)*Tile.TILE_SIZE - game.origin.y);
 			}
 
 			//reset style for rect-drawing
-			context.noStroke();
+			game.noStroke();
 
 			if (deathFrame > 36) //XXX: magic framerate-dependent constant
-				context.resetLevel();
+				game.resetLevel();
 
 			++deathFrame;
 		}

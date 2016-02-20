@@ -39,6 +39,6 @@ public final class Rectangle {
 
 	public boolean intersects(Rectangle other) {
 		return (pos.x < other.pos.x + other.dim.x && other.pos.x < pos.x + dim.x &&
-				pos.y < other.pos.y + other.dim.y && other.pos.y < pos.y + dim.y);
+		        pos.y < other.pos.y + other.dim.y && other.pos.y < pos.y + dim.y);
 	}
 }

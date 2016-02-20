@@ -18,8 +18,8 @@ public final class Spring extends Tile {
 	public Rectangle getHitbox() {
 		//XXX: wet code smell
 		int x = Math.round(pos.x), y = Math.round(pos.y);
-		boolean neighborLeft = context.level.tileAt(x - 1, y) instanceof Spring;
-		boolean neighborRight = context.level.tileAt(x + 1, y) instanceof Spring;
+		boolean neighborLeft = game.level.tileAt(x - 1, y) instanceof Spring;
+		boolean neighborRight = game.level.tileAt(x + 1, y) instanceof Spring;
 
 		//adjust the hitbox width and xpos to join up with its neighbors, if it has any
 		if (neighborLeft && neighborRight)
@@ -33,14 +33,14 @@ public final class Spring extends Tile {
 
 	@Override
 	public void draw() {
-		context.fill(color);
+		game.fill(color);
 
 		int x = Math.round(pos.x), y = Math.round(pos.y);
-		boolean neighborLeft = context.level.tileAt(x - 1, y) instanceof Spring;
-		boolean neighborRight = context.level.tileAt(x + 1, y) instanceof Spring;
+		boolean neighborLeft = game.level.tileAt(x - 1, y) instanceof Spring;
+		boolean neighborRight = game.level.tileAt(x + 1, y) instanceof Spring;
 
 		//draw the spring into the bottom 1/4 of the tile, rounding top corners where applicable
-		context.rect(pos.x*TILE_SIZE - context.origin.x, pos.y*TILE_SIZE + TILE_SIZE*3/4 - context.origin.y, TILE_SIZE, TILE_SIZE/4,
-					 neighborLeft? 0 : TILE_SIZE, neighborRight? 0 : TILE_SIZE, 0, 0);
+		game.rect(pos.x*TILE_SIZE - game.origin.x, pos.y*TILE_SIZE + TILE_SIZE*3/4 - game.origin.y, TILE_SIZE, TILE_SIZE/4,
+		          neighborLeft? 0 : TILE_SIZE, neighborRight? 0 : TILE_SIZE, 0, 0);
 	}
 }
