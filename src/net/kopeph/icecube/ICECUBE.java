@@ -1,6 +1,7 @@
 package net.kopeph.icecube;
 
 import net.kopeph.icecube.entity.Player;
+import net.kopeph.icecube.menu.MainMenu;
 import net.kopeph.icecube.menu.Menu;
 import net.kopeph.icecube.tile.Tile;
 import net.kopeph.icecube.util.Vector2;
@@ -18,20 +19,19 @@ import processing.event.MouseEvent;
 public final class ICECUBE extends PApplet {
 	public static final ICECUBE game = new ICECUBE();
 
-	public Level level;
-	public Player player;
-	private Player backup; //used to neatly reset the player's position and size if they die in a level
-
-	private boolean left, right, up, down, space;
-	private boolean w, a, s, d;
-
-	private final Menu mainMenu = new Menu();
-
 	private static final int
 		ST_GAME = 0,
 		ST_MENU = 1;
 
 	private int gameState = ST_MENU;
+
+	public Level level;
+	public Player player;
+	private Player backup; //used to neatly reset the player's position and size if they die in a level
+	private Menu mainMenu;
+
+	private boolean left, right, up, down, space;
+	private boolean w, a, s, d;
 
 	@Override
 	public void settings() {
@@ -45,6 +45,8 @@ public final class ICECUBE extends PApplet {
 		noStroke();
 		surface.setResizable(true);
 		surface.setTitle("ICECUBE         CONTROLS: A-LEFT  D-RIGHT  SPACE-JUMP  R-RESET  MOUSEWHEEL-ZOOM");
+
+		mainMenu = new MainMenu();
 
 		player = new Player(0, 0, 1, 1);
 		changeLevel("menu");

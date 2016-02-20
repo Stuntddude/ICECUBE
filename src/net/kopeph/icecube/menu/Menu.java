@@ -1,15 +1,11 @@
 package net.kopeph.icecube.menu;
 
-import java.util.ArrayList;
-import java.util.List;
-
 import net.kopeph.icecube.ICECUBE;
 
 public class Menu {
-	private final List<Widget> widgets = new ArrayList<>();
+	protected final ICECUBE game = ICECUBE.game;
 
 	public void draw() {
 		//TODO: placeholder
-		ICECUBE.game.background(0xCCAACC);
 	}
 }
