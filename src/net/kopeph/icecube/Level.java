@@ -25,8 +25,8 @@ public final class Level {
 	public final Rectangle right;
 
 	public Level(String levelName) {
-		PImage img = game.loadImage("res/" + levelName + ".png");
-		Map<Point, String> doors = parseMeta(game.loadStrings("res/" + levelName + ".txt"));
+		PImage img = game.loadImage("res/level/" + levelName + ".png");
+		Map<Point, String> doors = parseMeta(game.loadStrings("res/level/" + levelName + ".txt"));
 
 		width = img.width;
 		height = img.height;

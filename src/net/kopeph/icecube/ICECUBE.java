@@ -48,7 +48,7 @@ public final class ICECUBE extends PApplet {
 		surface.setResizable(true);
 		surface.setTitle("ICECUBE         CONTROLS: A-LEFT  D-RIGHT  SPACE-JUMP  R-RESET  MOUSEWHEEL-ZOOM");
 
-		font = createFont("res/Montserrat-Bold.ttf", 32);
+		font = createFont("res/Montserrat-Bold.ttf", 72);
 		textFont(font);
 		mainMenu = new MainMenu();
 

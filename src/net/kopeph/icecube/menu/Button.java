@@ -20,6 +20,6 @@ public class Button extends Widget {
 		game.fill(0);
 		game.rect(x, y, w, h);
 		game.fill(255);
-		game.text(text, x, y, w, h);
+		game.text(text, x, y - 8, w, h);
 	}
 }
