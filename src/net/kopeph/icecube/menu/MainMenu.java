@@ -1,10 +1,11 @@
 package net.kopeph.icecube.menu;
 
 public class MainMenu extends Menu {
-	private final Button button = new Button("Main Level", 10, 20, 200, 60);
+	private Button button;
 
 	@Override
 	public void draw() {
+		button = new Button("Main Level", game.width*0.1f, game.height*0.5f - 50, game.width*0.8f, 100);
 		game.background(0xCCAACC);
 		button.draw();
 	}

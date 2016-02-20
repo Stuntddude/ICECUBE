@@ -1,10 +1,12 @@
 package net.kopeph.icecube.menu;
 
+import processing.core.PConstants;
+
 public class Button extends Widget {
 	private final String text;
-	private final float x, y, w, h;
+	private float x, y, w, h;
 
-	public Button(String text, int x, int y, int w, int h) {
+	public Button(String text, float x, float y, float w, float h) {
 		this.text = text;
 		this.x = x;
 		this.y = y;
@@ -14,7 +16,10 @@ public class Button extends Widget {
 
 	@Override
 	public void draw() {
+		game.textAlign(PConstants.CENTER, PConstants.CENTER);
 		game.fill(0);
 		game.rect(x, y, w, h);
+		game.fill(255);
+		game.text(text, x, y, w, h);
 	}
 }

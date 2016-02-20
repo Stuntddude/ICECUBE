@@ -6,6 +6,7 @@ import net.kopeph.icecube.menu.Menu;
 import net.kopeph.icecube.tile.Tile;
 import net.kopeph.icecube.util.Vector2;
 import processing.core.PApplet;
+import processing.core.PFont;
 import processing.event.MouseEvent;
 
 /**
@@ -18,6 +19,7 @@ import processing.event.MouseEvent;
  */
 public final class ICECUBE extends PApplet {
 	public static final ICECUBE game = new ICECUBE();
+	public PFont font;
 
 	private static final int
 		ST_GAME = 0,
@@ -46,6 +48,8 @@ public final class ICECUBE extends PApplet {
 		surface.setResizable(true);
 		surface.setTitle("ICECUBE         CONTROLS: A-LEFT  D-RIGHT  SPACE-JUMP  R-RESET  MOUSEWHEEL-ZOOM");
 
+		font = createFont("res/Montserrat-Bold.ttf", 32);
+		textFont(font);
 		mainMenu = new MainMenu();
 
 		player = new Player(0, 0, 1, 1);
