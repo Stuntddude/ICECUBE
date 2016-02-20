@@ -1,6 +1,7 @@
 package net.kopeph.icecube;
 
 import net.kopeph.icecube.entity.Player;
+import net.kopeph.icecube.menu.Menu;
 import net.kopeph.icecube.tile.Tile;
 import net.kopeph.icecube.util.Vector2;
 import processing.core.PApplet;
@@ -22,6 +23,14 @@ public final class ICECUBE extends PApplet {
 	private boolean left, right, up, down, space;
 	private boolean w, a, s, d;
 	private static ICECUBE context;
+
+	private final Menu mainMenu = new Menu();
+
+	private static final int
+		ST_GAME = 0,
+		ST_MENU = 1;
+
+	private int gameState = ST_MENU;
 
 	@Override
 	public void settings() {
@@ -62,6 +71,13 @@ public final class ICECUBE extends PApplet {
 
 	@Override
 	public void draw() {
+		switch(gameState) {
+			case ST_GAME: drawGame(); break;
+			case ST_MENU: drawMenu(); break;
+		}
+	}
+
+	public void drawGame() {
 		player.move(left || a, right || d, up || w, down || s, space);
 
 		//update follow cam origin
@@ -74,6 +90,10 @@ public final class ICECUBE extends PApplet {
 		background(0xFF000000); //everything around me is black, the color of my soul
 		level.draw();
 		player.draw();
+	}
+
+	public void drawMenu() {
+		mainMenu.draw();
 	}
 
 	@Override
@@ -93,6 +113,8 @@ public final class ICECUBE extends PApplet {
 				case 'S': s = true; break;
 				case ' ': space = true; break;
 				case 'R': resetLevel(); break;
+				//placeholder menu break code
+				case ENTER: gameState = ST_GAME;
 			}
 		}
 	}
