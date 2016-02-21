@@ -2,10 +2,8 @@ package net.kopeph.icecube.menu;
 
 import net.kopeph.icecube.ICECUBE;
 
-public class Widget {
+public abstract class Widget {
 	protected final ICECUBE game = ICECUBE.game;
 
-	public void draw() {
-		//no-op
-	}
+	public abstract void draw();
 }

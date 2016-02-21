@@ -4,22 +4,21 @@ import processing.core.PConstants;
 
 public class Button extends Widget {
 	private final String text;
-	private float x, y, w, h;
+	private float y, h;
 
-	public Button(String text, float x, float y, float w, float h) {
+	public Button(String text, float yOffset, float height) {
 		this.text = text;
-		this.x = x;
-		this.y = y;
-		this.w = w;
-		this.h = h;
+		this.y = yOffset;
+		this.h = height;
 	}
 
 	@Override
 	public void draw() {
-		game.textAlign(PConstants.CENTER, PConstants.CENTER);
 		game.fill(0);
-		game.rect(x, y, w, h);
+		game.rect(game.width*0.1f, game.height/2 + y - h/2, game.width*0.8f, h);
+
+		game.textAlign(PConstants.CENTER, PConstants.CENTER);
 		game.fill(255);
-		game.text(text, x, y - 8, w, h);
+		game.text(text, game.width/2, game.height/2 + y - 12);
 	}
 }

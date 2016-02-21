@@ -1,12 +1,12 @@
 package net.kopeph.icecube.menu;
 
 public class MainMenu extends Menu {
-	private Button button;
+	private Button play, newGame, settings, language;
 
-	@Override
-	public void draw() {
-		button = new Button("Main Level", game.width*0.1f, game.height*0.5f - 50, game.width*0.8f, 100);
-		game.background(0xCCAACC);
-		button.draw();
+	public MainMenu() {
+		widgets.add(play     = new Button("Play",     -150, 75));
+		widgets.add(newGame  = new Button("New Game",  -50, 75));
+		widgets.add(settings = new Button("Settings",   50, 75));
+		widgets.add(language = new Button("Language",  150, 75));
 	}
 }
