@@ -32,9 +32,6 @@ public final class ICECUBE extends PApplet {
 	private Player backup; //used to neatly reset the player's position and size if they die in a level
 	private Menu mainMenu;
 
-	private boolean left, right, up, down, space;
-	private boolean w, a, s, d;
-
 	@Override
 	public void settings() {
 		size(1024, 768, P3D);
@@ -80,7 +77,11 @@ public final class ICECUBE extends PApplet {
 	}
 
 	public void drawGame() {
-		player.move(left || a, right || d, up || w, down || s, space);
+		player.move(Input.handler.isDown(Input.LEFT),
+		            Input.handler.isDown(Input.RIGHT),
+		            Input.handler.isDown(Input.UP),
+		            Input.handler.isDown(Input.DOWN),
+		            Input.handler.isDown(Input.JUMP));
 
 		//update follow cam origin
 		Vector2 screenCenter = origin.add(new Vector2(width/2, height/2));
@@ -96,50 +97,18 @@ public final class ICECUBE extends PApplet {
 
 	public void drawMenu() {
 		mainMenu.draw();
+		if (Input.handler.isDown(Input.SELECT))
+			gameState = ST_GAME;
 	}
 
 	@Override
 	public void keyPressed() {
-		if (key == CODED) {
-			switch(keyCode) {
-				case LEFT:  left  = true; break;
-				case RIGHT: right = true; break;
-				case UP:    up    = true; break;
-				case DOWN:  down  = true; break;
-			}
-		} else {
-			switch(Character.toUpperCase(key)) {
-				case 'A': a = true; break;
-				case 'D': d = true; break;
-				case 'W': w = true; break;
-				case 'S': s = true; break;
-				case ' ': space = true; break;
-				case 'R': resetLevel(); break;
-				//placeholder menu break code
-				case ENTER: gameState = ST_GAME;
-			}
-		}
+		Input.handler.handleKey(keyCode, true);
 	}
 
 	@Override
 	public void keyReleased() {
-		//XXX: wet code smell
-		if (key == CODED) {
-			switch(keyCode) {
-				case LEFT:  left  = false; break;
-				case RIGHT: right = false; break;
-				case UP:    up    = false; break;
-				case DOWN:  down  = false; break;
-			}
-		} else {
-			switch(Character.toUpperCase(key)) {
-				case 'A': a = false; break;
-				case 'D': d = false; break;
-				case 'W': w = false; break;
-				case 'S': s = false; break;
-				case ' ': space = false; break;
-			}
-		}
+		Input.handler.handleKey(keyCode, false);
 	}
 
 	@Override
