@@ -111,6 +111,19 @@ public final class ICECUBE extends PApplet {
 		Input.handler.handleKey(keyCode, false);
 	}
 
+	public void keyChanged(int control, boolean down) {
+		if (down) {
+			if (gameState == ST_MENU) {
+				if (control == Input.UP)
+					mainMenu.spinSelection(-1);
+				else if (control == Input.DOWN)
+					mainMenu.spinSelection(1);
+			}
+		} else {
+			//key release callbacks go here
+		}
+	}
+
 	@Override
 	public void mouseWheel(MouseEvent e) {
 		//find the center before the scale change and convert to world coordinates

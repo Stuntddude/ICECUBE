@@ -1,6 +1,6 @@
 package net.kopeph.icecube;
 
-import com.jogamp.newt.event.KeyEvent;
+import java.awt.event.KeyEvent;
 
 public final class Input {
 	public static final Input handler = new Input();
@@ -20,8 +20,7 @@ public final class Input {
 
 	//counts the number of applicable keys currently down for a given control code
 	//so that if e.g. the player presses A, then presses LEFT, then releases A, they won't stall
-	//XXX: this shouldn't work well with key repeats or when the window loses focus,
-	//yet somehow it does and I'm really confused.
+	//XXX: this won't work if key-repeat is enabled, but it looks like in P3D mode it isn't
 	private final int[] keysDown = new int[LENGTH];
 
 	public boolean isDown(int control) {
@@ -46,12 +45,8 @@ public final class Input {
 		int control = translateKey(keyCode);
 
 		if (down != isDown(control))
-			keyChange(control, down);
+			ICECUBE.game.keyChanged(control, down);
 
 		keysDown[control] += down? 1 : -1;
-	}
-
-	private void keyChange(int keyCode, boolean down) {
-		//TODO: implement callbacks here
 	}
 }
