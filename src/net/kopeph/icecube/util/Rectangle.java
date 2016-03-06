@@ -18,7 +18,7 @@ public final class Rectangle {
 	}
 
 	public Vector2 center() {
-		return new Vector2(pos.x + (dim.x/2), pos.y + (dim.y/2));
+		return new Vector2(pos.x + dim.x/2, pos.y + dim.y/2);
 	}
 
 	public float right() {

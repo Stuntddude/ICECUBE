@@ -1,15 +1,17 @@
 package net.kopeph.icecube.entity;
 
+import processing.core.PApplet;
+
 import net.kopeph.icecube.ICECUBE;
 import net.kopeph.icecube.tile.*;
 import net.kopeph.icecube.util.Rectangle;
 import net.kopeph.icecube.util.Vector2;
-import processing.core.PApplet;
 
 public final class Player {
 	private final ICECUBE game = ICECUBE.game;
 
-	private Vector2 pos, size, vel;
+	private Vector2 pos, size;
+	private float vel;
 	private int color = 0xFFFFFFFF; //white
 	private boolean dead = false;
 	private int deathFrame = 0; //used to drive the death animation; incremented every frame upon death
@@ -23,7 +25,7 @@ public final class Player {
 	public Player(Vector2 pos, Vector2 size) {
 		this.pos = pos;
 		this.size = size;
-		vel = new Vector2(0, 0);
+		vel = 0;
 	}
 
 	public Player(float x, float y, float w, float h) {
@@ -31,7 +33,7 @@ public final class Player {
 	}
 
 	public Rectangle getHitbox() {
-		return new Rectangle(pos, size.sub(new Vector2(BREATHING_ROOM, BREATHING_ROOM)));
+		return new Rectangle(pos, size.sub(BREATHING_ROOM, BREATHING_ROOM));
 	}
 
 	public void moveTo(Vector2 center) {
@@ -55,11 +57,11 @@ public final class Player {
 		}
 
 		Vector2 offset = new Vector2(0, 0);
-		if (left)  offset = offset.add(new Vector2(-SP, 0));
-		if (right) offset = offset.add(new Vector2( SP, 0));
+		if (left)  offset.addEquals(-SP, 0);
+		if (right) offset.addEquals( SP, 0);
 		//I'm adding small y-offset to the movement so the player doesn't get stuck on the ground
 		//this is DUCT TAPE! once the jam is over, the actual problem needs to be diagnosed and addressed
-		if ((left || right) && onFloor) pos = pos.add(new Vector2(0, -0.00001f));
+		if ((left || right) && onFloor) pos.addEquals(0, -0.00001f);
 
 		//debug growth
 //		if (up)
@@ -71,10 +73,10 @@ public final class Player {
 		float jumpStrength = 0.23f + 0.11f*size.x;
 
 		if (space && onFloor && !verticalSlide)
-			vel = vel.add(new Vector2(0, -jumpStrength)); //jump!
+			vel -= jumpStrength; //jump!
 
 		//do gravity
-		vel = vel.add(new Vector2(0, GRAVITY));
+		vel += GRAVITY;
 
 		//so that intersecting multiple interactive tiles doesn't multiply their effect
 		boolean shouldGrow = false, shouldShrink = false, boing = false;
@@ -99,7 +101,7 @@ public final class Player {
 						if (tile instanceof BluePad) {
 							shouldGrow = true;
 							//XXX: MORE DUCT TAPE
-							pos = pos.sub(new Vector2(0, BREATHING_ROOM));
+							pos.subEquals(0, BREATHING_ROOM);
 						} else {
 							shouldShrink = true;
 						}
@@ -113,19 +115,18 @@ public final class Player {
 		}
 
 		if (boing && onFloor)
-			vel = new Vector2(0, -0.6/PApplet.max(size.x, 0.38f));
+			vel = -0.6f/PApplet.max(size.x, 0.38f);
 
 		if (shouldShrink)
 			shrink();
 		if (shouldGrow)
 			grow();
 
-		offset = offset.add(vel);
+		offset.addEquals(0, vel);
 
-		Vector2 oldPos = pos;
+		float oldPosY = pos.y;
 		moveWithCollision(offset);
-		Vector2 deltap = pos.sub(oldPos);
-		vel = new Vector2(0, deltap.y);
+		vel = pos.y - oldPosY;
 
 		if (size.x <= 0.0f) {
 			dead = true;
@@ -142,30 +143,30 @@ public final class Player {
 		//try to grow player from the bottom center of their hitbox, if possible
 		//otherwise, try growing from the bottom left or bottom right
 		if (growImpl(GROWTH/2)) {
-			pos = pos.sub(new Vector2(GROWTH/2, GROWTH));
-			size = size.add(new Vector2(GROWTH, GROWTH));
+			pos.subEquals(GROWTH/2, GROWTH);
+			size.addEquals(GROWTH, GROWTH);
 		} else if (growImpl(GROWTH)) {
-			pos = pos.sub(new Vector2(GROWTH, GROWTH));
-			size = size.add(new Vector2(GROWTH, GROWTH));
+			pos.subEquals(GROWTH, GROWTH);
+			size.addEquals(GROWTH, GROWTH);
 		} else if (growImpl(0)) {
-			pos = pos.sub(new Vector2(0, GROWTH));
-			size = size.add(new Vector2(GROWTH, GROWTH));
+			pos.subEquals(0, GROWTH);
+			size.addEquals(GROWTH, GROWTH);
 		}
 	}
 
 	private boolean growImpl(float xcomp) {
-		Rectangle hb = new Rectangle(pos.sub(new Vector2(xcomp, GROWTH)),
-				 					 getHitbox().dim.add(new Vector2(GROWTH, GROWTH)));
+		Rectangle hb = new Rectangle(pos.sub(xcomp, GROWTH),
+				 					 getHitbox().dim.add(GROWTH, GROWTH));
 		return findIntersection(hb) == null;
 	}
 
 	private void shrink() {
 		if (size.x > 0.5f) {
-			pos = pos.add(new Vector2(GROWTH/2, GROWTH));
-			size = size.sub(new Vector2(GROWTH, GROWTH));
+			pos.addEquals(GROWTH/2, GROWTH);
+			size.subEquals(GROWTH, GROWTH);
 		} else {
-			pos = pos.add(new Vector2(GROWTH/4, GROWTH/2));
-			size = size.sub(new Vector2(GROWTH/2, GROWTH/2));
+			pos.addEquals(GROWTH/4, GROWTH/2);
+			size.subEquals(GROWTH/2, GROWTH/2);
 		}
 	}
 
@@ -211,7 +212,7 @@ public final class Player {
 				offset = eject(collision, offset);
 		} while (collision != null);
 
-		pos = pos.add(offset);
+		pos.addEquals(offset);
 		return offset;
 	}
 
@@ -266,7 +267,7 @@ public final class Player {
 		//whichever path was shorter should also tell us what direction (vertical or horizontal) the player should slide along the wall
 		verticalSlide = ex.mag() < ey.mag();
 
-		return offset.sub(ejection.mul(EJECTION_EPSILON));
+		return offset.subEquals(ejection.mul(EJECTION_EPSILON));
 	}
 
 	public void draw() {

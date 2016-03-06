@@ -2,13 +2,10 @@ package net.kopeph.icecube.util;
 
 import java.util.Arrays;
 
-/**
- * @immutable
- * @author alexg
- */
+/** @author alexg */
 public final class Vector2  {
-	public final float x;
-	public final float y;
+	public float x;
+	public float y;
 
 	/** constructs the <0, 0> vector */
 	public Vector2() {
@@ -37,7 +34,7 @@ public final class Vector2  {
 	 * @param m magnitude, or length
 	 * @param t theta, or angle (in radians)
 	 */
-	public static Vector2 polar(float m, float t) {
+	public static Vector2 polar(double m, double t) {
 		return new Vector2(m * Math.cos(t), m * Math.sin(t));
 	}
 
@@ -60,11 +57,67 @@ public final class Vector2  {
 	}
 
 	/**
+	 * Adds this and the supplied vector together, storing the result in this.
+	 * @return this
+	 */
+	public Vector2 addEquals(Vector2 rhs) {
+		x += rhs.x;
+		y += rhs.y;
+		return this;
+	}
+
+	/**
+	 * Adds this and the supplied vector together.
+	 * @return the resultant vector
+	 */
+	public Vector2 add(float x, float y) {
+		return new Vector2(this.x + x, this.y + y);
+	}
+
+	/**
+	 * Adds this and the supplied vector together, storing the result in this.
+	 * @return this
+	 */
+	public Vector2 addEquals(float x, float y) {
+		this.x += x;
+		this.y += y;
+		return this;
+	}
+
+	/**
 	 * Subtracts the supplied vector from this
 	 * @return the resultant vector
 	 */
 	public Vector2 sub(Vector2 rhs) {
 		return new Vector2(x - rhs.x, y - rhs.y);
+	}
+
+	/**
+	 * Subtracts the supplied vector from this, storing the result in this.
+	 * @return this
+	 */
+	public Vector2 subEquals(Vector2 rhs) {
+		x -= rhs.x;
+		y -= rhs.y;
+		return this;
+	}
+
+	/**
+	 * Subtracts the supplied vector from this
+	 * @return the resultant vector
+	 */
+	public Vector2 sub(float x, float y) {
+		return new Vector2(this.x - x, this.y - y);
+	}
+
+	/**
+	 * Subtracts the supplied vector from this, storing the result in this.
+	 * @return this
+	 */
+	public Vector2 subEquals(float x, float y) {
+		this.x -= x;
+		this.y -= y;
+		return this;
 	}
 
 	@Override
@@ -93,6 +146,16 @@ public final class Vector2  {
 	}
 
 	/**
+	 * Scales this vector by the supplied scalar, storing the result in this
+	 * @return this
+	 */
+	public Vector2 mulEquals(float scalar) {
+		x *= scalar;
+		y *= scalar;
+		return this;
+	}
+
+	/**
 	 * Performs the dot product of this and the supplied vector.
 	 * @return the resultant scalar
 	 */
@@ -101,11 +164,27 @@ public final class Vector2  {
 	}
 
 	/**
+	 * Performs the dot product of this and the supplied vector.
+	 * @return the resultant scalar
+	 */
+	public float dotMul(float x, float y) {
+		return this.x * x + this.y * y;
+	}
+
+	/**
 	 * Performs the cross product of this and the supplied vector.
 	 * @return the resultant scalar
 	 */
 	public float crossMul(Vector2 rhs) {
 		return x * rhs.y - y * rhs.x;
+	}
+
+	/**
+	 * Performs the cross product of this and the supplied vector.
+	 * @return the resultant scalar
+	 */
+	public float crossMul(float x, float y) {
+		return this.x * y - this.y * x;
 	}
 
 	/**
@@ -125,19 +204,91 @@ public final class Vector2  {
 	}
 
 	/**
+	 * Multiplies this vector with the supplied vector by their components, storing the result in this.
+	 * @return this
+	 */
+	public Vector2 compMulEquals(Vector2 rhs) {
+		x *= rhs.x;
+		y *= rhs.y;
+		return this;
+	}
+
+	/**
+	 * Multiplies this vector with the supplied vector by their components.
+	 * @return the resultant scalar
+	 */
+	public Vector2 compMul(float x, float y) {
+		return new Vector2(this.x * x, this.y * y);
+	}
+
+	/**
+	 * Multiplies this vector with the supplied vector by their components, storing the result in this.
+	 * @return this
+	 */
+	public Vector2 compMulEquals(float x, float y) {
+		this.x *= x;
+		this.y *= y;
+		return this;
+	}
+
+	/**
 	 * Adjusts the length of the vector (without changing the angle) such that it is 1 unit long.
 	 * @return the resultant vector
 	 */
 	public Vector2 normalize() {
-		if (mag() != 0) {
-			return new Vector2(x / mag(), y / mag());
-		}
+		float m = mag();
+		if (m != 0)
+			return new Vector2(x / m, y / m);
 		return new Vector2(0, 0);
 	}
 
-	/** @return the angle from this vector to to the supplied vector */
+	/**
+	 * Adjusts the length of the vector (without changing the angle) such that it is 1 unit long, storing the result in this.
+	 * @return this
+	 */
+	public Vector2 normalizeEquals() {
+		float m = mag();
+		if (m != 0) {
+			x /= m;
+			y /= m;
+		}
+		return this;
+	}
+
+	/**
+	 * Equivalent to <code>this.sub(other).theta()</code>.
+	 * @return the angle from this vector to the supplied vector
+	 */
 	public float thetaTo(Vector2 other) {
-		return sub(other).theta();
+		return (float)Math.atan2(y - other.y, x - other.x);
+	}
+
+	/**
+	 * Equivalent to <code>this.sub(x, y).theta()</code>.
+	 * @return the angle from this vector to the supplied vector
+	 */
+	public float thetaTo(float x, float y) {
+		return (float)Math.atan2(this.y - y, this.x - x);
+	}
+
+	/**
+	 * Equivalent to <code>this.sub(other).mag()</code>.
+	 * @return the distance from this vector to the supplied vector
+	 */
+	public float distanceTo(Vector2 other) {
+		float dx = x - other.x;
+		float dy = y - other.y;
+		return (float)Math.sqrt(dx * dx + dy * dy);
+	}
+
+	/**
+	 * Equivalent to <code>this.sub(x, y).mag()</code>.
+	 * @return the distance from this vector to the supplied vector
+	 */
+	public float distanceTo(float x, float y) {
+		float dx = this.x - x;
+		float dy = this.y - y;
+		return (float)Math.sqrt(dx * dx + dy * dy);
 	}
 
 	@Override

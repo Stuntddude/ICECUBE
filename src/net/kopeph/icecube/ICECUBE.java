@@ -1,13 +1,14 @@
 package net.kopeph.icecube;
 
+import processing.core.PApplet;
+import processing.core.PFont;
+import processing.event.MouseEvent;
+
 import net.kopeph.icecube.entity.Player;
 import net.kopeph.icecube.menu.MainMenu;
 import net.kopeph.icecube.menu.Menu;
 import net.kopeph.icecube.tile.Tile;
 import net.kopeph.icecube.util.Vector2;
-import processing.core.PApplet;
-import processing.core.PFont;
-import processing.event.MouseEvent;
 
 /**
  * A note about the game's coordinate system:
@@ -84,9 +85,9 @@ public final class ICECUBE extends PApplet {
 		            Input.handler.isDown(Input.JUMP));
 
 		//update follow cam origin
-		Vector2 screenCenter = origin.add(new Vector2(width/2, height/2));
-		Vector2 playerCenter = player.getHitbox().center().mul(Tile.TILE_SIZE);
-		float distance = playerCenter.sub(screenCenter).mag();
+		Vector2 screenCenter = origin.add(width/2, height/2);
+		Vector2 playerCenter = player.getHitbox().center().mulEquals(Tile.TILE_SIZE);
+		float distance = playerCenter.distanceTo(screenCenter);
 		if (distance > MAX_FOLLOW_DISTANCE)
 			origin = origin.add(Vector2.polar(distance - MAX_FOLLOW_DISTANCE, playerCenter.thetaTo(screenCenter)).mul(0.1f));
 

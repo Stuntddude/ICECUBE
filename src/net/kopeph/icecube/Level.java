@@ -4,12 +4,13 @@ import java.awt.Point;
 import java.util.HashMap;
 import java.util.Map;
 
-import net.kopeph.icecube.tile.*;
-import net.kopeph.icecube.util.Rectangle;
-import net.kopeph.icecube.util.Vector2;
 import processing.core.PApplet;
 import processing.core.PGraphics;
 import processing.core.PImage;
+
+import net.kopeph.icecube.tile.*;
+import net.kopeph.icecube.util.Rectangle;
+import net.kopeph.icecube.util.Vector2;
 
 public final class Level {
 	private final ICECUBE game = ICECUBE.game;
