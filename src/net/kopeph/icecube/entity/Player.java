@@ -64,10 +64,10 @@ public final class Player {
 		if ((left || right) && onFloor) pos.addEquals(0, -0.00001f);
 
 		//debug growth
-//		if (up)
-//			grow();
-//		else if (down)
-//			shrink();
+		if (up)
+			grow();
+		else if (down)
+			shrink();
 
 		//my size gives me strength!
 		float jumpStrength = 0.23f + 0.11f*size.x;
