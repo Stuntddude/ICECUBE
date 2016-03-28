@@ -50,7 +50,7 @@ public final class ICECUBE extends PApplet {
 		textFont(font);
 		mainMenu = new MainMenu();
 
-		player = new Player(0, 0, 1, 1);
+		player = new Player(0, 0, 1);
 		changeLevel("menu");
 	}
 

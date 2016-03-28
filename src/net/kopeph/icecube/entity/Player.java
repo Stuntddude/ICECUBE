@@ -10,38 +10,31 @@ import net.kopeph.icecube.util.Vector2;
 public final class Player {
 	private final ICECUBE game = ICECUBE.game;
 
-	private Vector2 pos, size;
+	private Vector2 pos;
+	private float size;
 	private float vel;
 	private int color = 0xFFFFFFFF; //white
 	private boolean dead = false;
 	private int deathFrame = 0; //used to drive the death animation; incremented every frame upon death
 
 	public Player(Player other) {
-		pos = other.pos;
+		pos = new Vector2(other.pos);
 		size = other.size;
 		vel = other.vel;
 	}
 
-	public Player(Vector2 pos, Vector2 size) {
-		this.pos = pos;
-		this.size = size;
+	public Player(float x, float y, float s) {
+		pos = new Vector2(x, y);
+		size = s;
 		vel = 0;
 	}
 
-	public Player(float x, float y, float w, float h) {
-		this(new Vector2(x, y), new Vector2(w, h));
-	}
-
 	public Rectangle getHitbox() {
-		return new Rectangle(pos, size.sub(BREATHING_ROOM, BREATHING_ROOM));
-	}
-
-	public void moveTo(Vector2 center) {
-		pos = center.sub(size.mul(0.5f));
+		return new Rectangle(pos.x, pos.y, size - BREATHING_ROOM, size - BREATHING_ROOM);
 	}
 
 	public void moveTo(float x, float y) {
-		moveTo(new Vector2(x, y));
+		pos = new Vector2(x - size/2, y - size/2);
 	}
 
 	private static final float SP = 0.15f;
@@ -50,7 +43,6 @@ public final class Player {
 	public void move(boolean left, boolean right, boolean up, boolean down, boolean space) {
 		//handle death by blipping out of existence
 		if (dead) {
-			//TODO: death animation
 			if (game.levelName.equals("end"))
 				game.exit();
 			return;
@@ -70,7 +62,7 @@ public final class Player {
 			shrink();
 
 		//my size gives me strength!
-		float jumpStrength = 0.23f + 0.11f*size.x;
+		float jumpStrength = 0.23f + 0.11f*size;
 
 		if (space && onFloor && !verticalSlide)
 			vel -= jumpStrength; //jump!
@@ -84,9 +76,9 @@ public final class Player {
 		//handle interaction with interactive tiles in the level
 		//only loop through tiles near the player, for efficiency
 		Rectangle hb = getHitbox();
-		int minx = Math.max(0, PApplet.floor(hb.pos.x));
+		int minx = Math.max(0, PApplet.floor(hb.x));
 		int maxx = Math.min(game.level.width, PApplet.ceil(hb.right()));
-		int miny = Math.max(0, PApplet.floor(hb.pos.y));
+		int miny = Math.max(0, PApplet.floor(hb.y));
 		int maxy = Math.min(game.level.height - 1, PApplet.ceil(hb.bottom()));
 		for (int y = miny; y <= maxy; ++y) {
 			for (int x = minx; x < maxx; ++x) {
@@ -97,7 +89,7 @@ public final class Player {
 						return;
 					}
 				} else if (tile instanceof SizePad) {
-					if (hb.intersects(tile.getHitbox().move(new Vector2(0, -0.5f)))) {
+					if (hb.intersects(tile.getHitbox().move(0, -0.5f))) {
 						if (tile instanceof BluePad) {
 							shouldGrow = true;
 							//XXX: MORE DUCT TAPE
@@ -115,7 +107,7 @@ public final class Player {
 		}
 
 		if (boing && onFloor)
-			vel = -0.6f/PApplet.max(size.x, 0.38f);
+			vel = -0.6f/PApplet.max(size, 0.38f);
 
 		if (shouldShrink)
 			shrink();
@@ -128,7 +120,7 @@ public final class Player {
 		moveWithCollision(offset);
 		vel = pos.y - oldPosY;
 
-		if (size.x <= 0.0f) {
+		if (size <= 0.0f) {
 			dead = true;
 			deathFrame = 0;
 		}
@@ -139,34 +131,31 @@ public final class Player {
 	private static final float GROWTH = 0.01f;
 
 	private void grow() {
-		//XXX: wet code smell
 		//try to grow player from the bottom center of their hitbox, if possible
 		//otherwise, try growing from the bottom left or bottom right
 		if (growImpl(GROWTH/2)) {
 			pos.subEquals(GROWTH/2, GROWTH);
-			size.addEquals(GROWTH, GROWTH);
+			size += GROWTH;
 		} else if (growImpl(GROWTH)) {
 			pos.subEquals(GROWTH, GROWTH);
-			size.addEquals(GROWTH, GROWTH);
+			size += GROWTH;
 		} else if (growImpl(0)) {
 			pos.subEquals(0, GROWTH);
-			size.addEquals(GROWTH, GROWTH);
+			size += GROWTH;
 		}
 	}
 
 	private boolean growImpl(float xcomp) {
-		Rectangle hb = new Rectangle(pos.sub(xcomp, GROWTH),
-				 					 getHitbox().dim.add(GROWTH, GROWTH));
-		return findIntersection(hb) == null;
+		return findIntersection(getHitbox().move(-xcomp, -GROWTH).grow(GROWTH, GROWTH)) == null;
 	}
 
 	private void shrink() {
-		if (size.x > 0.5f) {
+		if (size > 0.5f) {
 			pos.addEquals(GROWTH/2, GROWTH);
-			size.subEquals(GROWTH, GROWTH);
+			size -= GROWTH;
 		} else {
 			pos.addEquals(GROWTH/4, GROWTH/2);
-			size.subEquals(GROWTH/2, GROWTH/2);
+			size -= GROWTH;
 		}
 	}
 
@@ -205,12 +194,12 @@ public final class Player {
 
 	/** find and resolve all collisions for a given offset */
 	private Vector2 moveWithCollisionImpl(Vector2 offset) {
-		Rectangle collision = null;
-		do { //handle collisions until the player is free from all tiles
+		Rectangle collision = findIntersection(getHitbox().move(offset));
+		//handle collisions until the player is free from all tiles
+		while (collision != null) {
+			offset = eject(collision, offset);
 			collision = findIntersection(getHitbox().move(offset));
-			if (collision != null)
-				offset = eject(collision, offset);
-		} while (collision != null);
+		}
 
 		pos.addEquals(offset);
 		return offset;
@@ -228,9 +217,9 @@ public final class Player {
 			return game.level.right;
 
 		//only loop through tiles near the player, for efficiency
-		int minx = Math.max(0, PApplet.floor(hb.pos.x));
+		int minx = Math.max(0, PApplet.floor(hb.x));
 		int maxx = Math.min(game.level.width, PApplet.ceil(hb.right()));
-		int miny = Math.max(0, PApplet.floor(hb.pos.y));
+		int miny = Math.max(0, PApplet.floor(hb.y));
 		int maxy = Math.min(game.level.height, PApplet.ceil(hb.bottom()));
 		for (int y = miny; y < maxy; ++y) {
 			for (int x = minx; x < maxx; ++x) {
@@ -252,8 +241,8 @@ public final class Player {
 
 		//find the shortest path to backtrack that gets the player to where they're not colliding
 		//the minimum distance straight along x or y axis the player must be ejected to exit collision
-		float dx = offset.x > 0? hb.right()  - collision.pos.x : hb.pos.x - collision.right();
-		float dy = offset.y > 0? hb.bottom() - collision.pos.y : hb.pos.y - collision.bottom();
+		float dx = offset.x > 0? hb.right()  - collision.x : hb.x - collision.right();
+		float dy = offset.y > 0? hb.bottom() - collision.y : hb.y - collision.bottom();
 
 		//XXX: consider changing this so that the slope is only calculated once before all ejections (may remove infinite loop behavior)
 		float slope = offset.y/offset.x; //division by 0 should not be an issue since we get infinity, which plays nicely with the next step
@@ -267,12 +256,12 @@ public final class Player {
 		//whichever path was shorter should also tell us what direction (vertical or horizontal) the player should slide along the wall
 		verticalSlide = ex.mag() < ey.mag();
 
-		return offset.subEquals(ejection.mul(EJECTION_EPSILON));
+		return offset.subEquals(ejection.mulEquals(EJECTION_EPSILON));
 	}
 
 	public void draw() {
 		game.fill(color);
-		game.rect(pos.x*Tile.TILE_SIZE - game.origin.x, pos.y*Tile.TILE_SIZE - game.origin.y, size.x*Tile.TILE_SIZE, size.y*Tile.TILE_SIZE);
+		game.rect(pos.x*Tile.TILE_SIZE - game.origin.x, pos.y*Tile.TILE_SIZE - game.origin.y, size*Tile.TILE_SIZE, size*Tile.TILE_SIZE);
 
 		//TODO: extract to generic animations system
 		if (dead) {

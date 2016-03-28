@@ -23,12 +23,12 @@ public final class Spring extends Tile {
 
 		//adjust the hitbox width and xpos to join up with its neighbors, if it has any
 		if (neighborLeft && neighborRight)
-			return new Rectangle(pos, new Vector2(1.0f, 0.25f)).move(new Vector2(0.0f, 0.75f));
+			return new Rectangle(pos.x, pos.y, 1.0f, 0.25f).move(0.0f, 0.75f);
 		if (neighborRight)
-			return new Rectangle(pos, new Vector2(0.5f, 0.25f)).move(new Vector2(0.5f, 0.75f));
+			return new Rectangle(pos.x, pos.y, 0.5f, 0.25f).move(0.5f, 0.75f);
 		if (neighborLeft)
-			return new Rectangle(pos, new Vector2(0.5f, 0.25f)).move(new Vector2(0.0f, 0.75f));
-		return new Rectangle(pos, new Vector2(0.5f, 0.25f)).move(new Vector2(0.25f, 0.75f));
+			return new Rectangle(pos.x, pos.y, 0.5f, 0.25f).move(0.0f, 0.75f);
+		return new Rectangle(pos.x, pos.y, 0.5f, 0.25f).move(0.25f, 0.75f);
 	}
 
 	@Override

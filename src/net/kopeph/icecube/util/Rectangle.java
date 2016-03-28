@@ -2,35 +2,60 @@ package net.kopeph.icecube.util;
 
 /** @immutable */
 public final class Rectangle {
-	public final Vector2 pos, dim;
-
-	public Rectangle(Vector2 position, Vector2 dimensions) {
-		pos = position;
-		dim = dimensions;
-	}
+	public final float x, y, w, h;
 
 	public Rectangle(float x, float y, float w, float h) {
-		this(new Vector2(x, y), new Vector2(w, h));
+		this.x = x;
+		this.y = y;
+		this.w = w;
+		this.h = h;
+	}
+
+	public Rectangle(Vector2 position, Vector2 dimensions) {
+		x = position.x;
+		y = position.y;
+		w = dimensions.x;
+		h = dimensions.y;
+	}
+
+	public Rectangle move(float dx, float dy) {
+		return new Rectangle(x + dx, y + dy, w, h);
 	}
 
 	public Rectangle move(Vector2 offset) {
-		return new Rectangle(pos.add(offset), dim);
+		return new Rectangle(x + offset.x, y + offset.y, w, h);
+	}
+
+	public Rectangle grow(float dw, float dh) {
+		return new Rectangle(x, y, w + dw, h + dh);
+	}
+
+	public Rectangle grow(Vector2 offset) {
+		return new Rectangle(x, y, w + offset.x, h + offset.y);
 	}
 
 	public Vector2 center() {
-		return new Vector2(pos.x + dim.x/2, pos.y + dim.y/2);
+		return new Vector2(x + w/2, y + h/2);
+	}
+
+	public float top() {
+		return x;
+	}
+
+	public float left() {
+		return y;
 	}
 
 	public float right() {
-		return pos.x + dim.x;
+		return x + w;
 	}
 
 	public float bottom() {
-		return pos.y + dim.y;
+		return y + h;
 	}
 
-	public boolean contains(float x, float y) {
-		return (x > pos.x && y > pos.y && x < pos.x + dim.x && y < pos.y + dim.y);
+	public boolean contains(float x0, float y0) {
+		return x0 > x && y0 > y && x0 < x + w && y0 < y + h;
 	}
 
 	public boolean contains(Vector2 v) {
@@ -38,7 +63,7 @@ public final class Rectangle {
 	}
 
 	public boolean intersects(Rectangle other) {
-		return (pos.x < other.pos.x + other.dim.x && other.pos.x < pos.x + dim.x &&
-		        pos.y < other.pos.y + other.dim.y && other.pos.y < pos.y + dim.y);
+		return x < other.x + other.w && other.x < x + w &&
+		       y < other.y + other.h && other.y < y + h;
 	}
 }
