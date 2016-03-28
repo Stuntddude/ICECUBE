@@ -17,6 +17,11 @@ public class Menu {
 		selection = Math.floorMod(selection + dir, widgets.size());
 	}
 
+	/** triggers the behavior of the currently selected element (usually a button) */
+	public void interact() {
+		widgets.get(selection).interact();
+	}
+
 	public void draw() {
 		game.background(255);
 		for (int i = 0; i < widgets.size(); ++i)

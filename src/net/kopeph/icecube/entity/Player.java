@@ -43,7 +43,7 @@ public final class Player {
 	public void move(boolean left, boolean right, boolean up, boolean down, boolean space) {
 		//handle death by blipping out of existence
 		if (dead) {
-			if (game.levelName.equals("end"))
+			if (game.levelName.equals("end")) //$NON-NLS-1$
 				game.exit();
 			return;
 		}
@@ -234,7 +234,7 @@ public final class Player {
 	private Vector2 eject(Rectangle collision, Vector2 offset) {
 		//XXX: do we need to protect against NaNs?
 		if (offset.x == 0.0f && offset.y == 0.0f)
-			ICECUBE.println("NaN IN THE DUNGEON! THERE'S A NaN IN THE DUNGEON! Just thought you ought to know...");
+			ICECUBE.println("NaN IN THE DUNGEON! THERE'S A NaN IN THE DUNGEON! Just thought you ought to know..."); //$NON-NLS-1$
 
 		//the projected position after offset, to test for intersections
 		Rectangle hb = getHitbox().move(offset);

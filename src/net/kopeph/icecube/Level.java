@@ -26,8 +26,8 @@ public final class Level {
 	public final Rectangle right;
 
 	public Level(String levelName) {
-		PImage img = game.loadImage("res/level/" + levelName + ".png");
-		Map<Point, String> doors = parseMeta(game.loadStrings("res/level/" + levelName + ".txt"));
+		PImage img = game.loadImage("res/level/" + levelName + ".png"); //$NON-NLS-1$ //$NON-NLS-2$
+		Map<Point, String> doors = parseMeta(game.loadStrings("res/level/" + levelName + ".txt")); //$NON-NLS-1$ //$NON-NLS-2$
 
 		width = img.width;
 		height = img.height;
@@ -79,10 +79,10 @@ public final class Level {
 		Map<Point, String> doors = new HashMap<>();
 
 		for (String line : lines) {
-			if (line.trim().equals(""))
+			if (line.trim().equals("")) //$NON-NLS-1$
 				break;
-			String[] pair = line.split(":");
-			String[] coords = pair[0].split(",");
+			String[] pair = line.split(":"); //$NON-NLS-1$
+			String[] coords = pair[0].split(","); //$NON-NLS-1$
 			doors.put(new Point(Integer.parseInt(coords[0].trim()),
 			                    Integer.parseInt(coords[1].trim())),
 			          pair[1].trim());

@@ -22,11 +22,11 @@ public final class ICECUBE extends PApplet {
 	public static final ICECUBE game = new ICECUBE();
 	public PFont font;
 
-	private static final int
+	public static final int
 		ST_GAME = 0,
 		ST_MENU = 1;
 
-	private int gameState = ST_MENU;
+	public int gameState = ST_MENU;
 
 	public Level level;
 	public Player player;
@@ -46,12 +46,12 @@ public final class ICECUBE extends PApplet {
 		surface.setResizable(true);
 		surface.setTitle("ICECUBE         CONTROLS: A-LEFT  D-RIGHT  SPACE-JUMP  R-RESET  MOUSEWHEEL-ZOOM");
 
-		font = createFont("res/Montserrat-Bold.ttf", 72);
+		font = createFont("res/Montserrat-Bold.ttf", 72); //$NON-NLS-1$
 		textFont(font);
 		mainMenu = new MainMenu();
 
 		player = new Player(0, 0, 1);
-		changeLevel("menu");
+		changeLevel("menu"); //$NON-NLS-1$
 	}
 
 	public String levelName;
@@ -98,8 +98,6 @@ public final class ICECUBE extends PApplet {
 
 	public void drawMenu() {
 		mainMenu.draw();
-		if (Input.handler.isDown(Input.SELECT))
-			gameState = ST_GAME;
 	}
 
 	@Override
@@ -119,6 +117,8 @@ public final class ICECUBE extends PApplet {
 					mainMenu.spinSelection(-1);
 				else if (control == Input.DOWN)
 					mainMenu.spinSelection(1);
+				else if (control == Input.SELECT)
+					mainMenu.interact();
 			}
 		} else {
 			//key release callbacks go here
