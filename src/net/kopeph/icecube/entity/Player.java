@@ -65,7 +65,7 @@ public final class Player {
 		float jumpStrength = 0.23f + 0.11f*size;
 
 		if (space && onFloor && !verticalSlide)
-			vel -= jumpStrength; //jump!
+			vel = -jumpStrength; //jump!
 
 		//do gravity
 		vel += GRAVITY;
