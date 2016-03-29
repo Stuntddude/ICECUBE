@@ -5,8 +5,10 @@ import processing.core.PFont;
 import processing.event.MouseEvent;
 
 import net.kopeph.icecube.entity.Player;
+import net.kopeph.icecube.menu.LanguageMenu;
 import net.kopeph.icecube.menu.MainMenu;
 import net.kopeph.icecube.menu.Menu;
+import net.kopeph.icecube.menu.SettingsMenu;
 import net.kopeph.icecube.tile.Tile;
 import net.kopeph.icecube.util.Vector2;
 
@@ -20,6 +22,7 @@ import net.kopeph.icecube.util.Vector2;
  */
 public final class ICECUBE extends PApplet {
 	public static final ICECUBE game = new ICECUBE();
+	public boolean colorBlindMode = false;
 	public PFont font;
 
 	public static final int
@@ -31,7 +34,7 @@ public final class ICECUBE extends PApplet {
 	public Level level;
 	public Player player;
 	private Player backup; //used to neatly reset the player's position and size if they die in a level
-	private Menu mainMenu;
+	public Menu mainMenu, settingsMenu, languageMenu, currentMenu;
 
 	@Override
 	public void settings() {
@@ -49,6 +52,9 @@ public final class ICECUBE extends PApplet {
 		font = createFont("res/Montserrat-Bold.ttf", 72); //$NON-NLS-1$
 		textFont(font);
 		mainMenu = new MainMenu();
+		settingsMenu = new SettingsMenu();
+		languageMenu = new LanguageMenu();
+		currentMenu = mainMenu;
 
 		player = new Player(0, 0, 1);
 		changeLevel("menu"); //$NON-NLS-1$
@@ -71,10 +77,10 @@ public final class ICECUBE extends PApplet {
 
 	@Override
 	public void draw() {
-		switch(gameState) {
-			case ST_GAME: drawGame(); break;
-			case ST_MENU: drawMenu(); break;
-		}
+		if (gameState == ST_GAME)
+			drawGame();
+		else if (gameState == ST_MENU)
+			currentMenu.draw();
 	}
 
 	public void drawGame() {
@@ -96,10 +102,6 @@ public final class ICECUBE extends PApplet {
 		player.draw();
 	}
 
-	public void drawMenu() {
-		mainMenu.draw();
-	}
-
 	@Override
 	public void keyPressed() {
 		Input.handler.handleKey(keyCode, true);
@@ -114,11 +116,11 @@ public final class ICECUBE extends PApplet {
 		if (down) {
 			if (gameState == ST_MENU) {
 				if (control == Input.UP)
-					mainMenu.spinSelection(-1);
+					currentMenu.spinSelection(-1);
 				else if (control == Input.DOWN)
-					mainMenu.spinSelection(1);
+					currentMenu.spinSelection(1);
 				else if (control == Input.SELECT)
-					mainMenu.interact();
+					currentMenu.interact();
 			}
 		} else {
 			//key release callbacks go here

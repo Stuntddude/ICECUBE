@@ -3,7 +3,7 @@ package net.kopeph.icecube.menu;
 import processing.core.PConstants;
 
 public class Button extends Widget {
-	private final String text;
+	public String text;
 	private final float y;
 	public final Runnable behavior;
 
