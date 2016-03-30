@@ -1,5 +1,7 @@
 package net.kopeph.icecube;
 
+import java.util.prefs.Preferences;
+
 import processing.core.PApplet;
 import processing.core.PFont;
 import processing.event.MouseEvent;
@@ -24,6 +26,14 @@ public final class ICECUBE extends PApplet {
 	public static final ICECUBE game = new ICECUBE();
 	public boolean colorBlindMode = false;
 	public PFont font;
+
+	private static final String
+		PREFERENCES_NODE = "settings", //$NON-NLS-1$
+		KEY_LEVEL_NAME   = "level", //$NON-NLS-1$
+		KEY_PLAYER_INFO  = "player", //$NON-NLS-1$
+		KEY_INVALID      = "/null/"; //$NON-NLS-1$
+
+	private final Preferences diskStore = Preferences.userNodeForPackage(getClass()).node(PREFERENCES_NODE);
 
 	public static final int
 		ST_GAME = 0,
@@ -55,17 +65,41 @@ public final class ICECUBE extends PApplet {
 		settingsMenu = new SettingsMenu();
 		languageMenu = new LanguageMenu();
 		currentMenu = mainMenu;
-
-		player = new Player(0, 0, 1);
-		changeLevel("menu"); //$NON-NLS-1$
 	}
 
 	public String levelName;
+
+	public void loadGame() {
+		String name = diskStore.get(KEY_LEVEL_NAME , KEY_INVALID);
+		String info = diskStore.get(KEY_PLAYER_INFO, KEY_INVALID);
+
+		//if the information is invalid, start a new game
+		if (name.equals(KEY_INVALID) ||
+		    info.equals(KEY_INVALID)) {
+			newGame();
+		} else {
+			String[] infos = info.split(" "); //$NON-NLS-1$
+			player = new Player(Float.parseFloat(infos[0]),
+			                    Float.parseFloat(infos[1]));
+			changeLevel(name);
+			gameState = ST_GAME;
+		}
+	}
+
+	public void newGame() {
+		player = new Player(1, 0);
+		changeLevel("menu"); //$NON-NLS-1$
+		gameState = ST_GAME;
+	}
 
 	public void changeLevel(String name) {
 		level = new Level(name);
 		levelName = name;
 		backup = new Player(player);
+
+		//auto-save the game at the beginning of each level
+		diskStore.put(KEY_LEVEL_NAME, levelName);
+		diskStore.put(KEY_PLAYER_INFO, player.toString());
 	}
 
 	public void resetLevel() {

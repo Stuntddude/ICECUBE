@@ -8,12 +8,12 @@ import net.kopeph.icecube.util.Rectangle;
 import net.kopeph.icecube.util.Vector2;
 
 public final class Player {
+	private static final int color = 0xFFFFFFFF; //white
 	private final ICECUBE game = ICECUBE.game;
 
 	private Vector2 pos;
 	private float size;
 	private float vel;
-	private int color = 0xFFFFFFFF; //white
 	private boolean dead = false;
 	private int deathFrame = 0; //used to drive the death animation; incremented every frame upon death
 
@@ -23,10 +23,15 @@ public final class Player {
 		vel = other.vel;
 	}
 
-	public Player(float x, float y, float s) {
-		pos = new Vector2(x, y);
+	public Player(float s, float v) {
+		pos = new Vector2();
 		size = s;
-		vel = 0;
+		vel = v;
+	}
+
+	@Override
+	public String toString() {
+		return size + " " + vel; //$NON-NLS-1$
 	}
 
 	public Rectangle getHitbox() {

@@ -60,7 +60,6 @@ public final class Level {
 						tiles[i] = new Spring(x, y);
 						break;
 					case 0xFFFF00FF:
-						//XXX: player may end up inside a wall if there is no magenta pixel in level
 						game.player.moveTo(x + 0.5f, y + 0.5f);
 						break;
 				}

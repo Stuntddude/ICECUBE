@@ -5,6 +5,6 @@ public final class LanguageMenu extends Menu {
 
 	public LanguageMenu() {
 		widgets.add(english = new Button("English", -50, () -> { /* not implemented yet */ }));
-		widgets.add(back    = new Button("Back",     50, () -> { game.currentMenu = game.mainMenu; }));
+		widgets.add(back    = new Button("Back"   ,  50, () -> { game.currentMenu = game.mainMenu; }));
 	}
 }
