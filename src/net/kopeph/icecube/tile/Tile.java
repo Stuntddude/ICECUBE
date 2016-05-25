@@ -8,7 +8,7 @@ import net.kopeph.icecube.util.Vector2;
 public abstract class Tile {
 	public static float TILE_SIZE = 24;
 
-	protected final ICECUBE game = ICECUBE.game;
+	protected static final ICECUBE game = ICECUBE.game;
 
 	public final Vector2 pos;
 	public final int color;

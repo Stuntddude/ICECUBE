@@ -1,13 +1,17 @@
 package net.kopeph.icecube;
 
 import java.awt.Point;
+import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 import processing.core.PApplet;
 import processing.core.PGraphics;
 import processing.core.PImage;
 
+import net.kopeph.icecube.entity.Box;
+import net.kopeph.icecube.entity.Entity;
 import net.kopeph.icecube.tile.*;
 import net.kopeph.icecube.util.Rectangle;
 import net.kopeph.icecube.util.Vector2;
@@ -18,6 +22,8 @@ public final class Level {
 
 	public final int width, height;
 	public final Tile[] tiles;
+	public final List<Entity> originalEntities = new ArrayList<>();
+	public final List<Entity> entities = new ArrayList<>();
 
 	//rectangles to simulate collision with the borders of the level
 	public final Rectangle top;
@@ -27,7 +33,7 @@ public final class Level {
 
 	public Level(String levelName) {
 		PImage img = game.loadImage("res/level/" + levelName + ".png"); //$NON-NLS-1$ //$NON-NLS-2$
-		Map<Point, String> doors = parseMeta(game.loadStrings("res/level/" + levelName + ".txt")); //$NON-NLS-1$ //$NON-NLS-2$
+		Map<Point, String> meta = parseMeta(game.loadStrings("res/level/" + levelName + ".txt")); //$NON-NLS-1$ //$NON-NLS-2$
 
 		width = img.width;
 		height = img.height;
@@ -48,16 +54,21 @@ public final class Level {
 						tiles[i] = new BluePad(x, y);
 						break;
 					case 0xFF00FF00:
-						tiles[i] = new GoalTile(x, y, doors.get(new Point(x, y)));
+						tiles[i] = new GoalTile(x, y, meta.get(new Point(x, y)));
 						break;
 					case 0xFF808080:
 						tiles[i] = new TopHalfWall(x, y);
 						break;
 					case 0xFFFFFF00:
-						tiles[i] = new Door(x, y, doors.get(new Point(x, y)));
+						tiles[i] = new Door(x, y, meta.get(new Point(x, y)));
 						break;
 					case 0xFFFF8000:
 						tiles[i] = new Spring(x, y);
+						break;
+					case 0xFF00FFFF:
+						Box box = new Box(x, y, Float.parseFloat(meta.get(new Point(x, y))), 0);
+						originalEntities.add(box);
+						entities.add(box);
 						break;
 					case 0xFFFF00FF:
 						game.player.moveTo(x + 0.5f, y + 0.5f);
@@ -115,5 +126,8 @@ public final class Level {
 					tile.draw();
 			}
 		}
+
+		for (Entity entity : entities)
+			entity.draw();
 	}
 }
