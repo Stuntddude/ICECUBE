@@ -2,13 +2,19 @@ package net.kopeph.icecube.entity;
 
 import processing.core.PApplet;
 
+import org.jbox2d.collision.shapes.PolygonShape;
+import org.jbox2d.dynamics.*;
+
 import net.kopeph.icecube.ICECUBE;
-import net.kopeph.icecube.tile.*;
+import net.kopeph.icecube.tile.Tile;
 import net.kopeph.icecube.util.Rectangle;
 import net.kopeph.icecube.util.Vector2;
 
 public class Entity {
 	protected static final ICECUBE game = ICECUBE.game;
+
+	public final Body body;
+	public Fixture fixture, sensor;
 
 	protected Vector2 pos;
 	protected float size;
@@ -19,25 +25,41 @@ public class Entity {
 	private boolean dead = false;
 	private int deathFrame = 0; //used to drive the death animation; incremented every frame upon death
 
-	public Entity(Entity other) {
-		pos = new Vector2(other.pos);
-		size = other.size;
-		vel = other.vel;
-		color = other.color;
-	}
-
-	public Entity(Vector2 p, float s, float v, int c) {
-		pos = p;
-		size = s;
-		vel = v;
-		color = c;
-	}
-
 	public Entity(float x, float y, float s, float v, int c) {
 		pos = new Vector2(x, y);
 		size = s;
 		vel = v;
 		color = c;
+
+		//define physics body
+		BodyDef bodyDef = new BodyDef();
+		bodyDef.type = BodyType.DYNAMIC;
+		bodyDef.fixedRotation = true;
+		bodyDef.position.set(x, y);
+		bodyDef.userData = this;
+
+		//create main fixture (a 1x1 square with the corners chopped off)
+		PolygonShape shape = new PolygonShape();
+		//XXX: actually just a square for now
+		shape.setAsBox(size/2f, size/2f);
+
+		FixtureDef fixtureDef = new FixtureDef();
+		fixtureDef.shape = shape;
+		fixtureDef.density = 0.5f;
+		fixtureDef.friction = 0.0f;
+		fixtureDef.restitution = 0.0f;
+
+		//make!
+		body = ICECUBE.world.createBody(bodyDef);
+		fixture = body.createFixture(fixtureDef);
+	}
+
+	public Entity(Vector2 p, float s, float v, int c) {
+		this(p.x, p.y, s, v, c);
+	}
+
+	public Entity(Entity other) {
+		this(other.pos.x, other.pos.y, other.size, other.vel, other.color);
 	}
 
 	@Override
@@ -52,91 +74,119 @@ public class Entity {
 	protected static final float GRAVITY = 0.02f;
 
 	public void tick(Vector2 offset) {
-		//TODO: import relevant code from Player.move()
+		//currently no-op
+		pos = new Vector2(body.getPosition().x, body.getPosition().y);
 
-		//do gravity
-		vel += GRAVITY;
-
-		//so that intersecting multiple interactive tiles doesn't multiply their effect
-		boolean shouldGrow = false, shouldShrink = false, boing = false;
-
-		//handle interaction with interactive tiles in the level
-		//only loop through tiles near the player, for efficiency
-		Rectangle hb = getHitbox();
-		int minx = Math.max(0, PApplet.floor(hb.x));
-		int maxx = Math.min(game.level.width, PApplet.ceil(hb.right()));
-		int miny = Math.max(0, PApplet.floor(hb.y));
-		int maxy = Math.min(game.level.height - 1, PApplet.ceil(hb.bottom()));
-		for (int y = miny; y <= maxy; ++y) {
-			for (int x = minx; x < maxx; ++x) {
-				Tile tile = game.level.tileAt(x, y);
-				if (tile instanceof TransportTile) {
-					if (hb.intersects(tile.getHitbox())) {
-						game.changeLevel(((TransportTile)tile).level);
-						return;
-					}
-				} else if (tile instanceof SizePad) {
-					if (hb.intersects(tile.getHitbox().move(0, -0.5f))) {
-						if (tile instanceof BluePad) {
-							shouldGrow = true;
-							//XXX: MORE DUCT TAPE
-							pos.subEquals(0, BREATHING_ROOM);
-						} else {
-							shouldShrink = true;
-						}
-					}
-				} else if (tile instanceof Spring) {
-					if (hb.intersects(tile.getHitbox())) {
-						boing = true;
-					}
-				}
-			}
-		}
-
-		if (boing && onFloor)
-			vel = -0.6f/PApplet.max(size, 0.38f);
-
-		if (shouldShrink)
-			shrink();
-		if (shouldGrow)
-			grow();
-
-		offset.addEquals(0, vel);
-
-		float oldPosY = pos.y;
-		moveWithCollision(offset);
-		vel = pos.y - oldPosY;
+//		//do gravity
+//		vel += GRAVITY;
+//
+//		//so that intersecting multiple interactive tiles doesn't multiply their effect
+//		boolean shouldGrow = false, shouldShrink = false, boing = false;
+//
+//		//handle interaction with interactive tiles in the level
+//		//only loop through tiles near the player, for efficiency
+//		Rectangle hb = getHitbox();
+//		int minx = Math.max(0, PApplet.floor(hb.x));
+//		int maxx = Math.min(game.level.width, PApplet.ceil(hb.right()));
+//		int miny = Math.max(0, PApplet.floor(hb.y));
+//		int maxy = Math.min(game.level.height - 1, PApplet.ceil(hb.bottom()));
+//		for (int y = miny; y <= maxy; ++y) {
+//			for (int x = minx; x < maxx; ++x) {
+//				Tile tile = game.level.tileAt(x, y);
+//				if (tile instanceof TransportTile) {
+//					if (hb.intersects(tile.getHitbox())) {
+//						game.changeLevel(((TransportTile)tile).level);
+//						return;
+//					}
+//				} else if (tile instanceof SizePad) {
+//					if (hb.intersects(tile.getHitbox().move(0, -0.5f))) {
+//						if (tile instanceof BluePad) {
+//							shouldGrow = true;
+//							//XXX: MORE DUCT TAPE
+//							pos.subEquals(0, BREATHING_ROOM);
+//						} else {
+//							shouldShrink = true;
+//						}
+//					}
+//				} else if (tile instanceof Spring) {
+//					if (hb.intersects(tile.getHitbox())) {
+//						boing = true;
+//					}
+//				}
+//			}
+//		}
+//
+//		if (boing && onFloor)
+//			vel = -0.6f/PApplet.max(size, 0.38f);
+//
+//		if (shouldShrink)
+//			shrink();
+//		if (shouldGrow)
+//			grow();
+//
+//		offset.addEquals(0, vel);
+//
+//		float oldPosY = pos.y;
+//		moveWithCollision(offset);
+//		vel = pos.y - oldPosY;
 	}
 
 	private static final float GROWTH = 0.01f;
 
 	protected void grow() {
-		//try to grow player from the bottom center of their hitbox, if possible
-		//otherwise, try growing from the bottom left or bottom right
-		if (growImpl(GROWTH/2)) {
-			pos.subEquals(GROWTH/2, GROWTH);
-			size += GROWTH;
-		} else if (growImpl(GROWTH)) {
-			pos.subEquals(GROWTH, GROWTH);
-			size += GROWTH;
-		} else if (growImpl(0)) {
-			pos.subEquals(0, GROWTH);
-			size += GROWTH;
-		}
+		//TODO: find a way to limit growth in box2d
+		size += GROWTH;
+
+		//how many subroutines does it take to replace a light bulb?
+		replaceFixture();
+
+//		//try to grow player from the bottom center of their hitbox, if possible
+//		//otherwise, try growing from the bottom left or bottom right
+//		if (growImpl(GROWTH/2)) {
+//			pos.subEquals(GROWTH/2, GROWTH);
+//			size += GROWTH;
+//		} else if (growImpl(GROWTH)) {
+//			pos.subEquals(GROWTH, GROWTH);
+//			size += GROWTH;
+//		} else if (growImpl(0)) {
+//			pos.subEquals(0, GROWTH);
+//			size += GROWTH;
+//		}
 	}
 
-	protected boolean growImpl(float xcomp) {
+	private void replaceFixture() {
+		//de_stroy'd
+		body.destroyFixture(fixture);
+
+		//create a newer, larger, better-than-ever sqaure!
+		PolygonShape shape = new PolygonShape();
+		shape.setAsBox(size/2f, size/2f);
+
+		FixtureDef fixtureDef = new FixtureDef();
+		fixtureDef.shape = shape;
+		fixtureDef.density = 0.5f;
+		fixtureDef.friction = 0.0f;
+		fixtureDef.restitution = 0.1f;
+
+		fixture = body.createFixture(fixtureDef);
+	}
+
+	private boolean growImpl(float xcomp) {
 		return findIntersection(getHitbox().move(-xcomp, -GROWTH).grow(GROWTH, GROWTH)) == null;
 	}
 
 	protected void shrink() {
-		if (size > 0.5f) {
-			pos.addEquals(GROWTH/2, GROWTH);
-			size -= GROWTH;
-		} else {
-			pos.addEquals(GROWTH/4, GROWTH/2);
-			size -= GROWTH/2;
-		}
+		size -= GROWTH;
+
+		replaceFixture();
+
+//		if (size > 0.5f) {
+//			pos.addEquals(GROWTH/2, GROWTH);
+//			size -= GROWTH;
+//		} else {
+//			pos.addEquals(GROWTH/4, GROWTH/2);
+//			size -= GROWTH/2;
+//		}
 	}
 
 	//the factor by which to over-eject the entity to avoid potential floating point weirdness
@@ -188,14 +238,14 @@ public class Entity {
 	//TODO: make boxes find intersection with the player (override this method)
 	protected Rectangle findIntersection(Rectangle hb) {
 		//check for collision with the level borders as well as with tiles within the level
-		if (hb.intersects(game.level.top))
-			return game.level.top;
-		if (hb.intersects(game.level.bottom))
-			return game.level.bottom;
-		if (hb.intersects(game.level.left))
-			return game.level.left;
-		if (hb.intersects(game.level.right))
-			return game.level.right;
+//		if (hb.intersects(game.level.top))
+//			return game.level.top;
+//		if (hb.intersects(game.level.bottom))
+//			return game.level.bottom;
+//		if (hb.intersects(game.level.left))
+//			return game.level.left;
+//		if (hb.intersects(game.level.right))
+//			return game.level.right;
 
 		//only loop through tiles near the entity, for efficiency
 		int minx = Math.max(0, PApplet.floor(hb.x));
@@ -248,37 +298,43 @@ public class Entity {
 
 	public void draw() {
 		game.fill(color);
-		game.rect(pos.x*Tile.TILE_SIZE - game.origin.x, pos.y*Tile.TILE_SIZE - game.origin.y, size*Tile.TILE_SIZE, size*Tile.TILE_SIZE);
+		game.rect(body.getPosition().x*Tile.TILE_SIZE - game.origin.x,
+		          body.getPosition().y*Tile.TILE_SIZE - game.origin.y,
+		          size*Tile.TILE_SIZE,
+		          size*Tile.TILE_SIZE);
 
-		//TODO: extract to generic animations system
-		if (dead) {
-			//cosine is used here to provide a smooth easing for the animation, not for any trigonometric purpose
-			float start = PApplet.cos(PApplet.constrain(deathFrame/24.0f       , 0.0f, 1.0f)*PApplet.PI)*0.5f - 0.5f; //XXX: magic framerate-dependent constant
-			float end   = PApplet.cos(PApplet.constrain(deathFrame/24.0f - 0.5f, 0.0f, 1.0f)*PApplet.PI)*0.5f - 0.5f; //XXX: magic framerate-dependent constant
-
-			//setup style for line-drawing
-			game.stroke(0xFFFFFFFF); //white
-			game.strokeWeight(Tile.TILE_SIZE/8.0f); //XXX: magic constant
-			game.strokeCap(PApplet.SQUARE);
-
-			//use <s>the force</s> trigonometry to draw the line radially 6 times
-			for (int i = 0; i < 6; ++i) {
-				float sx = PApplet.sin(PApplet.PI*i/3.0f) * start;
-				float sy = PApplet.cos(PApplet.PI*i/3.0f) * start;
-				float ex = PApplet.sin(PApplet.PI*i/3.0f) * end;
-				float ey = PApplet.cos(PApplet.PI*i/3.0f) * end;
-
-				game.line((pos.x + sx)*Tile.TILE_SIZE - game.origin.x, (pos.y + sy)*Tile.TILE_SIZE - game.origin.y,
-				          (pos.x + ex)*Tile.TILE_SIZE - game.origin.x, (pos.y + ey)*Tile.TILE_SIZE - game.origin.y);
-			}
-
-			//reset style for rect-drawing
-			game.noStroke();
-
-			if (deathFrame > 36) //XXX: magic framerate-dependent constant
-				game.resetLevel();
-
-			++deathFrame;
-		}
+//		game.fill(color);
+//		game.rect(pos.x*Tile.TILE_SIZE - game.origin.x, pos.y*Tile.TILE_SIZE - game.origin.y, size*Tile.TILE_SIZE, size*Tile.TILE_SIZE);
+//
+//		//TODO: extract to generic animations system
+//		if (dead) {
+//			//cosine is used here to provide a smooth easing for the animation, not for any trigonometric purpose
+//			float start = PApplet.cos(PApplet.constrain(deathFrame/24.0f       , 0.0f, 1.0f)*PApplet.PI)*0.5f - 0.5f; //XXX: magic framerate-dependent constant
+//			float end   = PApplet.cos(PApplet.constrain(deathFrame/24.0f - 0.5f, 0.0f, 1.0f)*PApplet.PI)*0.5f - 0.5f; //XXX: magic framerate-dependent constant
+//
+//			//setup style for line-drawing
+//			game.stroke(0xFFFFFFFF); //white
+//			game.strokeWeight(Tile.TILE_SIZE/8.0f); //XXX: magic constant
+//			game.strokeCap(PApplet.SQUARE);
+//
+//			//use <s>the force</s> trigonometry to draw the line radially 6 times
+//			for (int i = 0; i < 6; ++i) {
+//				float sx = PApplet.sin(PApplet.PI*i/3.0f) * start;
+//				float sy = PApplet.cos(PApplet.PI*i/3.0f) * start;
+//				float ex = PApplet.sin(PApplet.PI*i/3.0f) * end;
+//				float ey = PApplet.cos(PApplet.PI*i/3.0f) * end;
+//
+//				game.line((pos.x + sx)*Tile.TILE_SIZE - game.origin.x, (pos.y + sy)*Tile.TILE_SIZE - game.origin.y,
+//				          (pos.x + ex)*Tile.TILE_SIZE - game.origin.x, (pos.y + ey)*Tile.TILE_SIZE - game.origin.y);
+//			}
+//
+//			//reset style for rect-drawing
+//			game.noStroke();
+//
+//			if (deathFrame > 36) //XXX: magic framerate-dependent constant
+//				game.resetLevel();
+//
+//			++deathFrame;
+//		}
 	}
 }

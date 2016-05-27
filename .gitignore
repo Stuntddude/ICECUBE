@@ -24,7 +24,7 @@ hs_err_pid*
 #Custom Excludes
 res-src/
 bin/
-libs/
+lib/
 *.launch
 export-*.xml
 git-*.sh

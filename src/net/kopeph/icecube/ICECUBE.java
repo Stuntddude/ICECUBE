@@ -6,6 +6,9 @@ import processing.core.PApplet;
 import processing.core.PFont;
 import processing.event.MouseEvent;
 
+import org.jbox2d.common.Vec2;
+import org.jbox2d.dynamics.World;
+
 import net.kopeph.icecube.entity.Entity;
 import net.kopeph.icecube.entity.Player;
 import net.kopeph.icecube.menu.LanguageMenu;
@@ -39,6 +42,8 @@ public final class ICECUBE extends PApplet {
 	public static final int
 		ST_GAME = 0,
 		ST_MENU = 1;
+
+	public static final World world = new World(new Vec2(0, 0.02f*60*60), false);
 
 	public int gameState = ST_MENU;
 
@@ -88,8 +93,8 @@ public final class ICECUBE extends PApplet {
 	}
 
 	public void newGame() {
-		player = new Player(1, 0);
-		changeLevel("test3"); //$NON-NLS-1$
+		player = new Player(.97f, 0);
+		changeLevel("menu"); //$NON-NLS-1$
 		gameState = ST_GAME;
 	}
 
@@ -107,9 +112,6 @@ public final class ICECUBE extends PApplet {
 		player = new Player(backup);
 	}
 
-	private static final float MAX_FOLLOW_DISTANCE = 30.0f;
-	public Vector2 origin = new Vector2(0, 0); //the top left corner of the screen in pixel coordinates (NOT world coordinates!)
-
 	@Override
 	public void draw() {
 		if (gameState == ST_GAME)
@@ -117,6 +119,13 @@ public final class ICECUBE extends PApplet {
 		else if (gameState == ST_MENU)
 			currentMenu.draw();
 	}
+
+	private static final float MAX_FOLLOW_DISTANCE = 30.0f;
+	public Vector2 origin = new Vector2(0, 0); //the top left corner of the screen in pixel coordinates (NOT world coordinates!)
+
+	public long startNanos;
+	public long elapsedNanos;
+	public long lastNanos;
 
 	public void drawGame() {
 		player.move(Input.handler.isDown(Input.LEFT),
@@ -129,14 +138,25 @@ public final class ICECUBE extends PApplet {
 		for (Entity entity : level.entities)
 			entity.tick(new Vector2());
 
+		long nanos = System.nanoTime();
+
+		float timeStep = (nanos - lastNanos)/1e9f; //in seconds
+		elapsedNanos = nanos - startNanos;
+		lastNanos = nanos;
+
+		int velocityIterations = 6;
+		int positionIterations = 3;
+		world.step(timeStep, velocityIterations, positionIterations);
+
 		//update follow cam origin
 		Vector2 screenCenter = origin.add(width/2, height/2);
 		Vector2 playerCenter = player.getHitbox().center().mulEquals(Tile.TILE_SIZE);
+
 		float distance = playerCenter.distanceTo(screenCenter);
 		if (distance > MAX_FOLLOW_DISTANCE)
 			origin = origin.add(Vector2.polar(distance - MAX_FOLLOW_DISTANCE, playerCenter.thetaTo(screenCenter)).mul(0.1f));
 
-		background(0xFF000000); //everything around me is black, the color of my soul
+		background(0xFF222222); //everything around me is black, the color of my soul
 		level.draw();
 		player.draw();
 	}

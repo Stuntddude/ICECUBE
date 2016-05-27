@@ -7,13 +7,19 @@ import java.util.List;
 import java.util.Map;
 
 import processing.core.PApplet;
+import processing.core.PConstants;
 import processing.core.PGraphics;
 import processing.core.PImage;
+
+import org.jbox2d.collision.shapes.PolygonShape;
+import org.jbox2d.dynamics.Body;
+import org.jbox2d.dynamics.BodyDef;
+import org.jbox2d.dynamics.BodyType;
+import org.jbox2d.dynamics.FixtureDef;
 
 import net.kopeph.icecube.entity.Box;
 import net.kopeph.icecube.entity.Entity;
 import net.kopeph.icecube.tile.*;
-import net.kopeph.icecube.util.Rectangle;
 import net.kopeph.icecube.util.Vector2;
 
 public final class Level {
@@ -26,10 +32,7 @@ public final class Level {
 	public final List<Entity> entities = new ArrayList<>();
 
 	//rectangles to simulate collision with the borders of the level
-	public final Rectangle top;
-	public final Rectangle bottom;
-	public final Rectangle left;
-	public final Rectangle right;
+	public final Body top, bottom, left, right;
 
 	public Level(String levelName) {
 		PImage img = game.loadImage("res/level/" + levelName + ".png"); //$NON-NLS-1$ //$NON-NLS-2$
@@ -78,10 +81,34 @@ public final class Level {
 		}
 
 		//initialize level borders
-		top = new Rectangle(-width, -height, width*3, height);
-		bottom = new Rectangle(-width, height, width*3, height);
-		left = new Rectangle(-width, 0, width, height);
-		right = new Rectangle(width, 0, width, height);
+		top = makeWall(width/2f, -height/2f, width*1.5f, height/2f);
+		bottom = makeWall(width/2f, height*1.5f, width*1.5f, height/2f);
+		left = makeWall(-width/2f, height/2f, width/2f, height/2f);
+		right = makeWall(width*1.5f, height/2f, width/2f, height/2f);
+
+//		top = new Rectangle(-width, -height, width*3, height);
+//		bottom = new Rectangle(-width, height, width*3, height);
+//		left = new Rectangle(-width, 0, width, height);
+//		right = new Rectangle(width, 0, width, height);
+	}
+
+	private Body makeWall(float x, float y, float hx, float hy) {
+		//define physics body
+		BodyDef bodyDef = new BodyDef();
+		bodyDef.type = BodyType.STATIC;
+		bodyDef.position.set(x - .5f, y - .5f);
+
+		//create collision fixture
+		PolygonShape shape = new PolygonShape();
+		shape.setAsBox(hx, hy);
+
+		FixtureDef fixture = new FixtureDef();
+		fixture.shape = shape;
+
+		//make!
+		Body body = ICECUBE.world.createBody(bodyDef);
+		body.createFixture(fixture);
+		return body;
 	}
 
 	/** parses a newline-separated list of door-to-level mappings in the format "x,y:name", ignoring all whitespace */
@@ -111,7 +138,8 @@ public final class Level {
 
 	public void draw() {
 		game.fill(0xFFAAAAAA); //a neutral grey
-		game.rect(-game.origin.x, -game.origin.y, width*Tile.TILE_SIZE, height*Tile.TILE_SIZE);
+		game.rectMode(PConstants.CORNER);
+		game.rect(-game.origin.x - Tile.TILE_SIZE/2, -game.origin.y - Tile.TILE_SIZE/2, width*Tile.TILE_SIZE, height*Tile.TILE_SIZE);
 
 		Vector2 worldOrigin = game.origin.mul(1.0f/Tile.TILE_SIZE);
 		int minx = Math.max(0, PApplet.floor(worldOrigin.x));
