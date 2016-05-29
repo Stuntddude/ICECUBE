@@ -46,7 +46,7 @@ public final class Player extends Entity {
 		//my size gives me strength!
 		float jumpStrength = 0.23f + 0.11f*size;
 
-		if (space && onFloor && !verticalSlide)
+		if (space && onFloor)
 			vel = -jumpStrength; //jump!
 
 		super.tick(offset);

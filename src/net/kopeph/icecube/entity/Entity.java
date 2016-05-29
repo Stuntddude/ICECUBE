@@ -52,8 +52,6 @@ public class Entity {
 	protected static final float GRAVITY = 0.02f;
 
 	public void tick(Vector2 offset) {
-		//TODO: import relevant code from Player.move()
-
 		//do gravity
 		vel += GRAVITY;
 
@@ -147,29 +145,57 @@ public class Entity {
 	//but I'm keeping it here for now because I don't think it hurts anything to have this safeguard
 	protected static final float BREATHING_ROOM = 0.0001f; //should be greater than (EJECTION_EPSILON - 1.0)
 
-	//XXX: code smell using class variables for functionality of method internals
-	protected boolean hasCollided, onFloor, verticalSlide;
+	//XXX: code smell: using class variables for functionality of method internals
+	protected boolean onFloor, verticalSlide;
 
 	//TODO: contingency plan for if the player does somehow get stuck inside of a tile they can't be ejected out of
 	//I assume players will mostly prefer an apparent glitch over the game freezing seemingly for no reason
 	//we can do this by keeping a list of tiles we've ejected from, and breaking out if we
 	protected void moveWithCollision(Vector2 offset) {
+		pushBoxes(offset);
+
 		Vector2 projected = pos.add(offset); //projected position of player after applying offset (used for wall sliding)
 
 		offset = moveWithCollisionImpl(offset);
 
-		//keep track of this for jumping logic
-		hasCollided = !pos.equals(projected);
-		onFloor = hasCollided && projected.y - pos.y >= 0.0f;
 		//if we haven't collided, we obviously don't need to slide, so we might as well exit early
-		if (!hasCollided)
+		if (pos.equals(projected)) {
+			onFloor = false;
 			return;
+		}
 
 		//slide along whatever wall we were last ejected from
 		offset = projected.sub(pos);
 		offset = verticalSlide? new Vector2(0, offset.y) : new Vector2(offset.x, 0);
 
-		offset = moveWithCollisionImpl(offset);
+		moveWithCollisionImpl(offset);
+
+		onFloor = projected.y - pos.y > 0.0f;
+	}
+
+	private void pushBoxes(Vector2 offset) {
+		Rectangle hb = getHitbox().move(offset);
+
+		for (Entity box : game.level.entities) {
+			//only push the box if we're coming at it from the side
+			Rectangle collision = box.getHitbox();
+			if (box != this && hb.intersects(collision)) {
+				//XXX: code copied almost wholesale from Entity.eject()
+				//find the shortest path to backtrack that gets the entity to where they're not colliding
+				float dx = offset.x > 0? hb.right()  - collision.x : hb.x - collision.right();
+				float dy = offset.y > 0? hb.bottom() - collision.y : hb.y - collision.bottom();
+
+				float slope = offset.y/offset.x; //division by 0 should not be an issue since we get infinity, which plays nicely with the next step
+
+				//trace backward along the entity's path using each of the supplied ejection distances, and compare their length
+				Vector2 ex = new Vector2(dx, dx*slope);
+				Vector2 ey = new Vector2(dy/slope, dy); //division by 0 should not be an issue since we get infinity, and that gets discarded at the next step
+
+				//which path was shorter tells us what side of the box the entity is hitting the box
+				if (ex.mag() < ey.mag())
+					box.moveWithCollision(new Vector2(offset.x/2, 0));
+			}
+		}
 	}
 
 	/** find and resolve all collisions for a given offset */
