@@ -11,7 +11,6 @@ import processing.core.PGraphics;
 import processing.core.PImage;
 
 import net.kopeph.icecube.entity.Box;
-import net.kopeph.icecube.entity.Entity;
 import net.kopeph.icecube.tile.*;
 import net.kopeph.icecube.util.Rectangle;
 import net.kopeph.icecube.util.Vector2;
@@ -22,8 +21,8 @@ public final class Level {
 
 	public final int width, height;
 	public final Tile[] tiles;
-	public final List<Entity> originalEntities = new ArrayList<>();
-	public final List<Entity> entities = new ArrayList<>();
+	private final List<Box> originalBoxes = new ArrayList<>();
+	public List<Box> boxes;
 
 	//rectangles to simulate collision with the borders of the level
 	public final Rectangle top;
@@ -43,7 +42,6 @@ public final class Level {
 			for (int x = 0; x < width; ++x) {
 				int i = y*width + x;
 				switch (img.pixels[i]) {
-					//XXX: wet code smell
 					case 0xFF000000:
 						tiles[i] = new WallTile(x, y);
 						break;
@@ -67,8 +65,8 @@ public final class Level {
 						break;
 					case 0xFF00FFFF:
 						Box box = new Box(x, y, Float.parseFloat(meta.get(new Point(x, y))), 0);
-						originalEntities.add(box);
-						entities.add(box);
+						box.moveTo(x + 0.5f, y + 0.5f);
+						originalBoxes.add(box);
 						break;
 					case 0xFFFF00FF:
 						game.player.moveTo(x + 0.5f, y + 0.5f);
@@ -82,6 +80,14 @@ public final class Level {
 		bottom = new Rectangle(-width, height, width*3, height);
 		left = new Rectangle(-width, 0, width, height);
 		right = new Rectangle(width, 0, width, height);
+
+		reset();
+	}
+
+	public void reset() {
+		boxes = new ArrayList<Box>();
+		for (Box box : originalBoxes)
+			boxes.add(new Box(box));
 	}
 
 	/** parses a newline-separated list of door-to-level mappings in the format "x,y:name", ignoring all whitespace */
@@ -127,7 +133,7 @@ public final class Level {
 			}
 		}
 
-		for (Entity entity : entities)
-			entity.draw();
+		for (Box box : boxes)
+			box.draw();
 	}
 }

@@ -21,13 +21,9 @@ public final class Box extends Entity {
 	//make boxes able to properly collide with the player
 	@Override
 	protected Rectangle findIntersection(Rectangle hb) {
-		Rectangle other = super.findIntersection(hb);
-		if (other != null)
-			return other;
-
 		if (hb.intersects(game.player.getHitbox()))
 			return game.player.getHitbox();
 
-		return null;
+		return super.findIntersection(hb);
 	}
 }

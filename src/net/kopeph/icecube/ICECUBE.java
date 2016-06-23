@@ -6,7 +6,7 @@ import processing.core.PApplet;
 import processing.core.PFont;
 import processing.event.MouseEvent;
 
-import net.kopeph.icecube.entity.Entity;
+import net.kopeph.icecube.entity.Box;
 import net.kopeph.icecube.entity.Player;
 import net.kopeph.icecube.menu.LanguageMenu;
 import net.kopeph.icecube.menu.MainMenu;
@@ -89,7 +89,7 @@ public final class ICECUBE extends PApplet {
 
 	public void newGame() {
 		player = new Player(1, 0);
-		changeLevel("test3"); //$NON-NLS-1$
+		changeLevel("test15"); //$NON-NLS-1$
 		gameState = ST_GAME;
 	}
 
@@ -105,6 +105,7 @@ public final class ICECUBE extends PApplet {
 
 	public void resetLevel() {
 		player = new Player(backup);
+		level.reset();
 	}
 
 	private static final float MAX_FOLLOW_DISTANCE = 30.0f;
@@ -125,9 +126,8 @@ public final class ICECUBE extends PApplet {
 		            Input.handler.isDown(Input.DOWN),
 		            Input.handler.isDown(Input.JUMP));
 
-		//TODO: experiment with moving entities before vs. after the player
-		for (Entity entity : level.entities)
-			entity.tick(new Vector2());
+		for (Box box : level.boxes)
+			box.tick(new Vector2());
 
 		//update follow cam origin
 		Vector2 screenCenter = origin.add(width/2, height/2);

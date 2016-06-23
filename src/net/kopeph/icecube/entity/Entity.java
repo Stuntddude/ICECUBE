@@ -3,7 +3,10 @@ package net.kopeph.icecube.entity;
 import processing.core.PApplet;
 
 import net.kopeph.icecube.ICECUBE;
-import net.kopeph.icecube.tile.*;
+import net.kopeph.icecube.tile.BluePad;
+import net.kopeph.icecube.tile.SizePad;
+import net.kopeph.icecube.tile.Spring;
+import net.kopeph.icecube.tile.Tile;
 import net.kopeph.icecube.util.Rectangle;
 import net.kopeph.icecube.util.Vector2;
 
@@ -16,8 +19,8 @@ public class Entity {
 
 	private final int color;
 
-	private boolean dead = false;
-	private int deathFrame = 0; //used to drive the death animation; incremented every frame upon death
+	protected boolean dead = false;
+	protected int deathFrame = 0; //used to drive the death animation; incremented every frame upon death
 
 	public Entity(Entity other) {
 		pos = new Vector2(other.pos);
@@ -49,9 +52,16 @@ public class Entity {
 		return new Rectangle(pos.x, pos.y, size - BREATHING_ROOM, size - BREATHING_ROOM);
 	}
 
+	public void moveTo(float x, float y) {
+		pos = new Vector2(x - size/2, y - size/2);
+	}
+
 	protected static final float GRAVITY = 0.02f;
 
 	public void tick(Vector2 offset) {
+		if (dead)
+			return;
+
 		//do gravity
 		vel += GRAVITY;
 
@@ -59,33 +69,26 @@ public class Entity {
 		boolean shouldGrow = false, shouldShrink = false, boing = false;
 
 		//handle interaction with interactive tiles in the level
-		//only loop through tiles near the player, for efficiency
+		//only loop through tiles near the entity, for efficiency
 		Rectangle hb = getHitbox();
 		int minx = Math.max(0, PApplet.floor(hb.x));
 		int maxx = Math.min(game.level.width, PApplet.ceil(hb.right()));
-		int miny = Math.max(0, PApplet.floor(hb.y));
+		int miny = Math.max(0, PApplet.floor(hb.bottom()));
 		int maxy = Math.min(game.level.height - 1, PApplet.ceil(hb.bottom()));
 		for (int y = miny; y <= maxy; ++y) {
 			for (int x = minx; x < maxx; ++x) {
 				Tile tile = game.level.tileAt(x, y);
-				if (tile instanceof TransportTile) {
-					if (hb.intersects(tile.getHitbox())) {
-						game.changeLevel(((TransportTile)tile).level);
-						return;
-					}
-				} else if (tile instanceof SizePad) {
-					if (hb.intersects(tile.getHitbox().move(0, -0.5f))) {
-						if (tile instanceof BluePad) {
-							shouldGrow = true;
-							//XXX: MORE DUCT TAPE
-							pos.subEquals(0, BREATHING_ROOM);
-						} else {
-							shouldShrink = true;
-						}
-					}
-				} else if (tile instanceof Spring) {
-					if (hb.intersects(tile.getHitbox())) {
-						boing = true;
+				if (tile instanceof Spring && hb.intersects(tile.getHitbox())) {
+					boing = true;
+				} else if (tile instanceof SizePad && hb.intersects(tile.getHitbox().move(0, -0.2f))) {
+					//TODO: consider replacing this with collision-based logic
+					//where if an Entity collides with a SizePad from above, they will grow or shrink on the next frame
+					if (tile instanceof BluePad) {
+						shouldGrow = true;
+						//XXX: MORE DUCT TAPE
+						pos.subEquals(0, BREATHING_ROOM);
+					} else {
+						shouldShrink = true;
 					}
 				}
 			}
@@ -94,9 +97,9 @@ public class Entity {
 		if (boing && onFloor)
 			vel = -0.6f/PApplet.max(size, 0.38f);
 
-		if (shouldShrink)
+		if (shouldShrink && !shouldGrow)
 			shrink();
-		if (shouldGrow)
+		if (shouldGrow && !shouldShrink)
 			grow();
 
 		offset.addEquals(0, vel);
@@ -104,12 +107,17 @@ public class Entity {
 		float oldPosY = pos.y;
 		moveWithCollision(offset);
 		vel = pos.y - oldPosY;
+
+		if (size <= 0.01f) {
+			dead = true;
+			deathFrame = 0;
+		}
 	}
 
 	private static final float GROWTH = 0.01f;
 
 	protected void grow() {
-		//try to grow player from the bottom center of their hitbox, if possible
+		//try to grow entity from the bottom center of their hitbox, if possible
 		//otherwise, try growing from the bottom left or bottom right
 		if (growImpl(GROWTH/2)) {
 			pos.subEquals(GROWTH/2, GROWTH);
@@ -140,23 +148,24 @@ public class Entity {
 	//the factor by which to over-eject the entity to avoid potential floating point weirdness
 	protected static final float EJECTION_EPSILON = 1.00001f;
 
-	//the amount by which to shrink the player's hitbox, also to avoid floating point weirdness
-	//this may not be necessary, since the player is supposed to be constantly changing size anyway
+	//the amount by which to shrink the entity's hitbox, also to avoid floating point weirdness
+	//this may not be necessary, since the entity is supposed to be constantly changing size anyway
 	//but I'm keeping it here for now because I don't think it hurts anything to have this safeguard
 	protected static final float BREATHING_ROOM = 0.0001f; //should be greater than (EJECTION_EPSILON - 1.0)
 
 	//XXX: code smell: using class variables for functionality of method internals
 	protected boolean onFloor, verticalSlide;
 
-	//TODO: contingency plan for if the player does somehow get stuck inside of a tile they can't be ejected out of
+	//TODO: contingency plan for if the entity does somehow get stuck inside of a tile they can't be ejected out of
 	//I assume players will mostly prefer an apparent glitch over the game freezing seemingly for no reason
-	//we can do this by keeping a list of tiles we've ejected from, and breaking out if we
+	//we can do this by keeping a list of tiles we've ejected from, and breaking out if we hit a repeat
+	//or simply limiting the number of ejections allowed to some reasonable upper bound, like 100
 	protected void moveWithCollision(Vector2 offset) {
 		pushBoxes(offset);
 
-		Vector2 projected = pos.add(offset); //projected position of player after applying offset (used for wall sliding)
+		Vector2 projected = pos.add(offset); //projected position of entity after applying offset (used for wall sliding)
 
-		offset = moveWithCollisionImpl(offset);
+		offset = moveWithCollisionImpl(offset, offset.y/offset.x);
 
 		//if we haven't collided, we obviously don't need to slide, so we might as well exit early
 		if (pos.equals(projected)) {
@@ -168,7 +177,7 @@ public class Entity {
 		offset = projected.sub(pos);
 		offset = verticalSlide? new Vector2(0, offset.y) : new Vector2(offset.x, 0);
 
-		moveWithCollisionImpl(offset);
+		moveWithCollisionImpl(offset, offset.y/offset.x);
 
 		onFloor = projected.y - pos.y > 0.0f;
 	}
@@ -176,7 +185,7 @@ public class Entity {
 	private void pushBoxes(Vector2 offset) {
 		Rectangle hb = getHitbox().move(offset);
 
-		for (Entity box : game.level.entities) {
+		for (Box box : game.level.boxes) {
 			//only push the box if we're coming at it from the side
 			Rectangle collision = box.getHitbox();
 			if (box != this && hb.intersects(collision)) {
@@ -192,6 +201,7 @@ public class Entity {
 				Vector2 ey = new Vector2(dy/slope, dy); //division by 0 should not be an issue since we get infinity, and that gets discarded at the next step
 
 				//which path was shorter tells us what side of the box the entity is hitting the box
+				//TODO: experiment with making the push speed proportional to the ratio between box sizes
 				if (ex.mag() < ey.mag())
 					box.moveWithCollision(new Vector2(offset.x/2, 0));
 			}
@@ -199,11 +209,11 @@ public class Entity {
 	}
 
 	/** find and resolve all collisions for a given offset */
-	private Vector2 moveWithCollisionImpl(Vector2 offset) {
+	private Vector2 moveWithCollisionImpl(Vector2 offset, float slope) {
 		Rectangle collision = findIntersection(getHitbox().move(offset));
-		//handle collisions until the player is free from all tiles
+		//handle collisions until the entity is free from all tiles
 		while (collision != null) {
-			offset = eject(collision, offset);
+			offset = eject(collision, offset, slope);
 			collision = findIntersection(getHitbox().move(offset));
 		}
 
@@ -211,7 +221,6 @@ public class Entity {
 		return offset;
 	}
 
-	//TODO: make boxes find intersection with the player (override this method)
 	protected Rectangle findIntersection(Rectangle hb) {
 		//check for collision with the level borders as well as with tiles within the level
 		if (hb.intersects(game.level.top))
@@ -237,14 +246,14 @@ public class Entity {
 		}
 
 		//check collision with entities, which could be anywhere
-		for (Entity entity : game.level.entities)
-			if (entity != this && hb.intersects(entity.getHitbox()))
-				return entity.getHitbox();
+		for (Box box : game.level.boxes)
+			if (box != this && hb.intersects(box.getHitbox()))
+				return box.getHitbox();
 
 		return null;
 	}
 
-	private Vector2 eject(Rectangle collision, Vector2 offset) {
+	private Vector2 eject(Rectangle collision, Vector2 offset, float slope) {
 		//XXX: do we need to protect against NaNs?
 		if (offset.x == 0.0f && offset.y == 0.0f)
 			ICECUBE.println("NaN IN THE DUNGEON! THERE'S A NaN IN THE DUNGEON! Just thought you ought to know..."); //$NON-NLS-1$
@@ -253,12 +262,9 @@ public class Entity {
 		Rectangle hb = getHitbox().move(offset);
 
 		//find the shortest path to backtrack that gets the entity to where they're not colliding
-		//the minimum distance straight along x or y axis the player must be ejected to exit collision
+		//the minimum distance straight along x or y axis the entity must be ejected to exit collision
 		float dx = offset.x > 0? hb.right()  - collision.x : hb.x - collision.right();
 		float dy = offset.y > 0? hb.bottom() - collision.y : hb.y - collision.bottom();
-
-		//XXX: consider changing this so that the slope is only calculated once before all ejections (may remove infinite loop behavior)
-		float slope = offset.y/offset.x; //division by 0 should not be an issue since we get infinity, which plays nicely with the next step
 
 		//trace backward along the entity's path using each of the supplied ejection distances, and compare their length
 		Vector2 ex = new Vector2(dx, dx*slope);
@@ -283,7 +289,7 @@ public class Entity {
 			float end   = PApplet.cos(PApplet.constrain(deathFrame/24.0f - 0.5f, 0.0f, 1.0f)*PApplet.PI)*0.5f - 0.5f; //XXX: magic framerate-dependent constant
 
 			//setup style for line-drawing
-			game.stroke(0xFFFFFFFF); //white
+			game.stroke(color);
 			game.strokeWeight(Tile.TILE_SIZE/8.0f); //XXX: magic constant
 			game.strokeCap(PApplet.SQUARE);
 
@@ -300,9 +306,6 @@ public class Entity {
 
 			//reset style for rect-drawing
 			game.noStroke();
-
-			if (deathFrame > 36) //XXX: magic framerate-dependent constant
-				game.resetLevel();
 
 			++deathFrame;
 		}

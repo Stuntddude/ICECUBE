@@ -20,7 +20,7 @@ public final class Input {
 
 	//counts the number of applicable keys currently down for a given control code
 	//so that if e.g. the player presses A, then presses LEFT, then releases A, they won't stall
-	//XXX: this won't work if key-repeat is enabled, but it looks like in P3D mode it isn't
+	//this won't work if key-repeat is enabled, but it looks like in P3D mode it isn't
 	private final int[] keysDown = new int[LENGTH];
 
 	public boolean isDown(int control) {
