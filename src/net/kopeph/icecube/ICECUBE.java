@@ -164,6 +164,8 @@ public final class ICECUBE extends PApplet {
 			} else {
 				if (control == Input.DEBUG)
 					debug = !debug;
+				else if (control == Input.RESET)
+					resetLevel();
 			}
 		} else {
 			//key release callbacks go here

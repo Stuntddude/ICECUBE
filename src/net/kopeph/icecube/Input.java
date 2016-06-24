@@ -35,7 +35,7 @@ public final class Input {
 			case 'A': case KeyEvent.VK_LEFT:  return LEFT;
 			case 'D': case KeyEvent.VK_RIGHT: return RIGHT;
 			case ' ':                         return JUMP;
-			case 'r':                         return RESET;
+			case 'R':                         return RESET;
 			case '\r': case '\n':             return SELECT;
 			case KeyEvent.VK_ESCAPE:          return ESC;
 			case '`':                         return DEBUG;
