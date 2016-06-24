@@ -181,8 +181,10 @@ public final class ICECUBE extends PApplet {
 					debug = !debug;
 				else if (control == Input.RESET)
 					resetLevel();
-				else if (control == Input.ESC)
+				else if (control == Input.ESC) {
 					gameState = ST_MENU;
+					mainMenu.selection = 0;
+				}
 			}
 		} else {
 			//key release callbacks go here

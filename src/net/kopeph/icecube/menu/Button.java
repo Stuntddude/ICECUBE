@@ -21,7 +21,7 @@ public class Button extends Widget {
 	@Override
 	public void draw(boolean selected) {
 		game.textAlign(PConstants.CENTER, PConstants.CENTER);
-		game.fill(selected? 0xFFAAAAAA : 0xFF000000);
+		game.fill(selected? 0xFF2288DD : 0xFF000000); //blue : black
 		game.text(text, game.width/2, game.height/2 + y - 12);
 	}
 }

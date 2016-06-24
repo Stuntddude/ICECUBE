@@ -9,7 +9,7 @@ public class Menu {
 	protected final ICECUBE game = ICECUBE.game;
 
 	protected final List<Widget> widgets = new ArrayList<>();
-	private int selection = 0;
+	public int selection = 0;
 
 	/** @param dir -1 to move selection up one element, 1 to move it down */
 	public void spinSelection(int dir) {
