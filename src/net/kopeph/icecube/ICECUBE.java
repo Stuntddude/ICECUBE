@@ -25,23 +25,25 @@ import net.kopeph.icecube.util.Vector2;
  */
 public final class ICECUBE extends PApplet {
 	public static final ICECUBE game = new ICECUBE();
-	public boolean colorBlindMode = false;
-	public PFont font;
-	public boolean debug;
 
-	private static final String
-		PREFERENCES_NODE = "settings", //$NON-NLS-1$
-		KEY_LEVEL_NAME   = "level", //$NON-NLS-1$
-		KEY_PLAYER_INFO  = "player", //$NON-NLS-1$
-		KEY_INVALID      = "/null/"; //$NON-NLS-1$
+	public static final String
+		PREFERENCES_NODE    = "settings", //$NON-NLS-1$
+		KEY_LEVEL_NAME      = "level", //$NON-NLS-1$
+		KEY_PLAYER_INFO     = "player", //$NON-NLS-1$
+		KEY_COLORBLIND_MODE = "colorblind",
+		KEY_INVALID         = "/null/"; //$NON-NLS-1$
 
-	private final Preferences diskStore = Preferences.userNodeForPackage(getClass()).node(PREFERENCES_NODE);
+	public final Preferences diskStore = Preferences.userNodeForPackage(getClass()).node(PREFERENCES_NODE);
 
 	public static final int
 		ST_GAME = 0,
 		ST_MENU = 1;
 
 	public int gameState = ST_MENU;
+
+	public boolean colorBlindMode = diskStore.getBoolean(KEY_COLORBLIND_MODE, false);
+	public PFont font;
+	public boolean debug;
 
 	public Level level;
 	public Player player;
@@ -76,8 +78,7 @@ public final class ICECUBE extends PApplet {
 		String info = diskStore.get(KEY_PLAYER_INFO, KEY_INVALID);
 
 		//if the information is invalid, start a new game
-		if (name.equals(KEY_INVALID) ||
-		    info.equals(KEY_INVALID)) {
+		if (name.equals(KEY_INVALID) || info.equals(KEY_INVALID)) {
 			newGame();
 		} else {
 			String[] infos = info.split(" "); //$NON-NLS-1$
