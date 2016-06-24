@@ -60,7 +60,7 @@ public final class ICECUBE extends PApplet {
 		surface.setResizable(true);
 		surface.setTitle("ICECUBE         CONTROLS: A-LEFT  D-RIGHT  SPACE-JUMP  R-RESET  MOUSEWHEEL-ZOOM");
 
-		font = createFont("res/Montserrat-Bold.ttf", 72); //$NON-NLS-1$
+		font = createFont("Montserrat-Bold.ttf", 72); //$NON-NLS-1$
 		textFont(font);
 		mainMenu = new MainMenu();
 		settingsMenu = new SettingsMenu();
@@ -89,7 +89,7 @@ public final class ICECUBE extends PApplet {
 
 	public void newGame() {
 		player = new Player(1, 0);
-		changeLevel("test15"); //$NON-NLS-1$
+		changeLevel("test/test12"); //$NON-NLS-1$
 		gameState = ST_GAME;
 	}
 

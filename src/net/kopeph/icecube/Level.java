@@ -31,7 +31,7 @@ public final class Level {
 	public final Rectangle right;
 
 	public Level(String levelName) {
-		PImage img = game.loadImage("res/level/" + levelName + ".png"); //$NON-NLS-1$ //$NON-NLS-2$
+		PImage img = game.loadImage("level/" + levelName + ".png"); //$NON-NLS-1$ //$NON-NLS-2$
 		Map<Point, String> meta = parseMeta(game.loadStrings("res/level/" + levelName + ".txt")); //$NON-NLS-1$ //$NON-NLS-2$
 
 		width = img.width;

@@ -23,7 +23,7 @@ public final class Player extends Entity {
 	public void move(boolean left, boolean right, boolean up, boolean down, boolean space) {
 		//closes the game after the last level
 		if (dead) {
-			if (game.levelName.equals("end")) //$NON-NLS-1$
+			if (game.levelName.equals("old/end")) //$NON-NLS-1$
 				game.exit();
 
 			if (deathFrame > 36) //XXX: magic framerate-dependent constant
