@@ -145,6 +145,7 @@ public final class ICECUBE extends PApplet {
 	@Override
 	public void keyPressed() {
 		Input.handler.handleKey(keyCode, true);
+		key = 0; //stop ESC from always closing the program
 	}
 
 	@Override
@@ -161,11 +162,17 @@ public final class ICECUBE extends PApplet {
 					currentMenu.spinSelection(1);
 				else if (control == Input.SELECT)
 					currentMenu.interact();
+				else if (control == Input.ESC && currentMenu != mainMenu)
+					currentMenu = mainMenu;
+				else if (control == Input.ESC)
+					exit();
 			} else {
 				if (control == Input.DEBUG)
 					debug = !debug;
 				else if (control == Input.RESET)
 					resetLevel();
+				else if (control == Input.ESC)
+					gameState = ST_MENU;
 			}
 		} else {
 			//key release callbacks go here
