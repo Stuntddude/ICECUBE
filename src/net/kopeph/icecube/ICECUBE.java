@@ -27,6 +27,7 @@ public final class ICECUBE extends PApplet {
 	public static final ICECUBE game = new ICECUBE();
 	public boolean colorBlindMode = false;
 	public PFont font;
+	public boolean debug;
 
 	private static final String
 		PREFERENCES_NODE = "settings", //$NON-NLS-1$
@@ -89,7 +90,7 @@ public final class ICECUBE extends PApplet {
 
 	public void newGame() {
 		player = new Player(1, 0);
-		changeLevel("test/test12"); //$NON-NLS-1$
+		changeLevel("old/menu"); //$NON-NLS-1$
 		gameState = ST_GAME;
 	}
 
@@ -160,6 +161,9 @@ public final class ICECUBE extends PApplet {
 					currentMenu.spinSelection(1);
 				else if (control == Input.SELECT)
 					currentMenu.interact();
+			} else {
+				if (control == Input.DEBUG)
+					debug = !debug;
 			}
 		} else {
 			//key release callbacks go here

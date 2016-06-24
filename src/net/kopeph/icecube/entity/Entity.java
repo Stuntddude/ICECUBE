@@ -52,8 +52,16 @@ public class Entity {
 		return new Rectangle(pos.x, pos.y, size - BREATHING_ROOM, size - BREATHING_ROOM);
 	}
 
+	public Rectangle getGroundSensor() {
+		return new Rectangle(pos.x + BREATHING_ROOM*2, pos.y + size, size - BREATHING_ROOM*4, 0.1f);
+	}
+
 	public void moveTo(float x, float y) {
 		pos = new Vector2(x - size/2, y - size/2);
+	}
+
+	public boolean onGround() {
+		return findIntersection(getGroundSensor()) != null;
 	}
 
 	protected static final float GRAVITY = 0.02f;
@@ -80,7 +88,7 @@ public class Entity {
 				Tile tile = game.level.tileAt(x, y);
 				if (tile instanceof Spring && hb.intersects(tile.getHitbox())) {
 					boing = true;
-				} else if (tile instanceof SizePad && hb.intersects(tile.getHitbox().move(0, -0.2f))) {
+				} else if (tile instanceof SizePad && hb.intersects(tile.getHitbox().move(0, -0.5f))) {
 					//TODO: consider replacing this with collision-based logic
 					//where if an Entity collides with a SizePad from above, they will grow or shrink on the next frame
 					if (tile instanceof BluePad) {
@@ -94,7 +102,7 @@ public class Entity {
 			}
 		}
 
-		if (boing && onFloor)
+		if (boing && onGround())
 			vel = -0.6f/PApplet.max(size, 0.38f);
 
 		if (shouldShrink && !shouldGrow)
@@ -154,7 +162,7 @@ public class Entity {
 	protected static final float BREATHING_ROOM = 0.0001f; //should be greater than (EJECTION_EPSILON - 1.0)
 
 	//XXX: code smell: using class variables for functionality of method internals
-	protected boolean onFloor, verticalSlide;
+	protected boolean verticalSlide;
 
 	//TODO: contingency plan for if the entity does somehow get stuck inside of a tile they can't be ejected out of
 	//I assume players will mostly prefer an apparent glitch over the game freezing seemingly for no reason
@@ -168,18 +176,14 @@ public class Entity {
 		offset = moveWithCollisionImpl(offset, offset.y/offset.x);
 
 		//if we haven't collided, we obviously don't need to slide, so we might as well exit early
-		if (pos.equals(projected)) {
-			onFloor = false;
+		if (pos.equals(projected))
 			return;
-		}
 
 		//slide along whatever wall we were last ejected from
 		offset = projected.sub(pos);
 		offset = verticalSlide? new Vector2(0, offset.y) : new Vector2(offset.x, 0);
 
 		moveWithCollisionImpl(offset, offset.y/offset.x);
-
-		onFloor = projected.y - pos.y > 0.0f;
 	}
 
 	private void pushBoxes(Vector2 offset) {
@@ -308,6 +312,17 @@ public class Entity {
 			game.noStroke();
 
 			++deathFrame;
+		}
+
+		if (game.debug) {
+			game.fill(onGround()? 0xAA22AAFF : 0xAAFFAA22); //transparent light blue : transparent light red
+
+			Rectangle sensor = getGroundSensor();
+
+			game.rect(sensor.x*Tile.TILE_SIZE - game.origin.x,
+			          sensor.y*Tile.TILE_SIZE - game.origin.y,
+			          sensor.w*Tile.TILE_SIZE,
+			          sensor.h*Tile.TILE_SIZE);
 		}
 	}
 }

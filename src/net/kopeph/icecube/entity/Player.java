@@ -37,7 +37,7 @@ public final class Player extends Entity {
 		if (right) offset.addEquals( SP, 0);
 		//I'm adding small y-offset to the movement so the player doesn't get stuck on the ground
 		//this is DUCT TAPE! once the jam is over, the actual problem needs to be diagnosed and addressed
-		if ((left || right) && onFloor) pos.addEquals(0, -0.00001f);
+		if ((left || right) && onGround()) pos.addEquals(0, -0.00001f);
 
 		//debug growth
 		if (up)
@@ -48,7 +48,7 @@ public final class Player extends Entity {
 		//my size gives me strength!
 		float jumpStrength = 0.23f + 0.11f*size;
 
-		if (space && onFloor)
+		if (space && onGround())
 			vel = -jumpStrength; //jump!
 
 		//interact with TransportTiles
