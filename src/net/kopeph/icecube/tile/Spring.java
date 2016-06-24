@@ -40,7 +40,6 @@ public final class Spring extends Tile {
 		boolean neighborRight = game.level.tileAt(x + 1, y) instanceof Spring;
 
 		//draw the spring into the bottom 1/4 of the tile, rounding top corners where applicable
-		game.rect(pos.x*TILE_SIZE - game.origin.x, pos.y*TILE_SIZE + TILE_SIZE*3/4 - game.origin.y, TILE_SIZE, TILE_SIZE/4,
-		          neighborLeft? 0 : TILE_SIZE, neighborRight? 0 : TILE_SIZE, 0, 0);
+		game.rect(pos.x, pos.y + 0.75f, 1, 0.25f, neighborLeft? 0 : 1, neighborRight? 0 : 1, 0, 0);
 	}
 }

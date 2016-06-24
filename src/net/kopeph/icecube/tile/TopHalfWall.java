@@ -27,6 +27,6 @@ public final class TopHalfWall extends Tile {
 	@Override
 	public void draw() {
 		game.fill(color);
-		game.rect(pos.x*TILE_SIZE - game.origin.x, pos.y*TILE_SIZE - game.origin.y, TILE_SIZE, TILE_SIZE/2);
+		game.rect(pos.x, pos.y, 1, 0.5f);
 	}
 }

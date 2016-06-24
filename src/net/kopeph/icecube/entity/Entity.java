@@ -284,7 +284,7 @@ public class Entity {
 
 	public void draw() {
 		game.fill(color);
-		game.rect(pos.x*Tile.TILE_SIZE - game.origin.x, pos.y*Tile.TILE_SIZE - game.origin.y, size*Tile.TILE_SIZE, size*Tile.TILE_SIZE);
+		game.rect(pos.x, pos.y, size, size);
 
 		//TODO: extract to generic animations system
 		if (dead) {
@@ -294,7 +294,7 @@ public class Entity {
 
 			//setup style for line-drawing
 			game.stroke(color);
-			game.strokeWeight(Tile.TILE_SIZE/8.0f); //XXX: magic constant
+			game.strokeWeight(0.25f);
 			game.strokeCap(PApplet.SQUARE);
 
 			//use <s>the force</s> trigonometry to draw the line radially 6 times
@@ -304,8 +304,7 @@ public class Entity {
 				float ex = PApplet.sin(PApplet.PI*i/3.0f) * end;
 				float ey = PApplet.cos(PApplet.PI*i/3.0f) * end;
 
-				game.line((pos.x + sx)*Tile.TILE_SIZE - game.origin.x, (pos.y + sy)*Tile.TILE_SIZE - game.origin.y,
-				          (pos.x + ex)*Tile.TILE_SIZE - game.origin.x, (pos.y + ey)*Tile.TILE_SIZE - game.origin.y);
+				game.line(pos.x + sx, pos.y + sy, pos.x + ex, pos.y + ey);
 			}
 
 			//reset style for rect-drawing
@@ -316,13 +315,8 @@ public class Entity {
 
 		if (game.debug) {
 			game.fill(onGround()? 0xAA22AAFF : 0xAAFFAA22); //transparent light blue : transparent light red
-
 			Rectangle sensor = getGroundSensor();
-
-			game.rect(sensor.x*Tile.TILE_SIZE - game.origin.x,
-			          sensor.y*Tile.TILE_SIZE - game.origin.y,
-			          sensor.w*Tile.TILE_SIZE,
-			          sensor.h*Tile.TILE_SIZE);
+			game.rect(sensor.x, sensor.y, sensor.w, sensor.h);
 		}
 	}
 }

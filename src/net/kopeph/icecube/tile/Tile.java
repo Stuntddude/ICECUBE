@@ -35,6 +35,6 @@ public abstract class Tile {
 	//like ramps and buttons and shit
 	public void draw() {
 		game.fill(color);
-		game.rect(pos.x*TILE_SIZE - game.origin.x, pos.y*TILE_SIZE - game.origin.y, TILE_SIZE, TILE_SIZE);
+		game.rect(pos.x, pos.y, 1, 1);
 	}
 }

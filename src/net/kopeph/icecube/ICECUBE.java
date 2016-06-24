@@ -110,7 +110,7 @@ public final class ICECUBE extends PApplet {
 		level.reset();
 	}
 
-	private static final float MAX_FOLLOW_DISTANCE = 30.0f;
+	private static final float MAX_FOLLOW_DISTANCE = 30.0f; //specified in pixels
 	public Vector2 origin = new Vector2(0, 0); //the top left corner of the screen in pixel coordinates (NOT world coordinates!)
 
 	@Override
@@ -122,6 +122,12 @@ public final class ICECUBE extends PApplet {
 	}
 
 	public void drawGame() {
+		//apply worldspace transform
+		game.pushMatrix();
+		game.translate(game.width/2, game.height/2);
+		game.scale(Tile.TILE_SIZE, Tile.TILE_SIZE);
+		game.translate(-origin.x, -origin.y);
+
 		player.move(Input.handler.isDown(Input.LEFT),
 		            Input.handler.isDown(Input.RIGHT),
 		            Input.handler.isDown(Input.UP),
@@ -132,15 +138,18 @@ public final class ICECUBE extends PApplet {
 			box.tick(new Vector2());
 
 		//update follow cam origin
-		Vector2 screenCenter = origin.add(width/2, height/2);
-		Vector2 playerCenter = player.getHitbox().center().mulEquals(Tile.TILE_SIZE);
-		float distance = playerCenter.distanceTo(screenCenter);
-		if (distance > MAX_FOLLOW_DISTANCE)
-			origin = origin.add(Vector2.polar(distance - MAX_FOLLOW_DISTANCE, playerCenter.thetaTo(screenCenter)).mul(0.1f));
+		Vector2 playerCenter = player.getHitbox().center();
+		float distance = origin.distanceTo(playerCenter);
+		float maxFollowDistance = MAX_FOLLOW_DISTANCE/Tile.TILE_SIZE; //convert follow cam radius to world coordinates
+		if (distance > maxFollowDistance)
+			origin.subEquals(Vector2.polar(distance - maxFollowDistance, origin.thetaTo(playerCenter)).mulEquals(0.1f));
 
 		background(0xFF000000); //everything around me is black, the color of my soul
 		level.draw();
 		player.draw();
+
+		//reset transfrom
+		game.popMatrix();
 	}
 
 	@Override
@@ -182,19 +191,8 @@ public final class ICECUBE extends PApplet {
 
 	@Override
 	public void mouseWheel(MouseEvent e) {
-		//find the center before the scale change and convert to world coordinates
-		Vector2 screenCenter = origin.add(new Vector2(width/2, height/2));
-		Vector2 worldCenter = screenCenter.mul(1/Tile.TILE_SIZE);
-
 		//scale by 2^(1/n) where n is the number of scale increments between each power-of-two zoom level
 		Tile.TILE_SIZE *= pow(pow(2.0f, 0.25f), -e.getCount());
-
-		//use the world center from before and convert back into screen coords using the new tile size
-		Vector2 newScreenCenter = worldCenter.mul(Tile.TILE_SIZE);
-		Vector2 newScreenOrigin = newScreenCenter.sub(new Vector2(width/2, height/2));
-
-		//update the real origin
-		origin = newScreenOrigin;
 	}
 
 	public static void main(String[] args) {

@@ -13,7 +13,6 @@ import processing.core.PImage;
 import net.kopeph.icecube.entity.Box;
 import net.kopeph.icecube.tile.*;
 import net.kopeph.icecube.util.Rectangle;
-import net.kopeph.icecube.util.Vector2;
 
 public final class Level {
 	private final ICECUBE game = ICECUBE.game;
@@ -117,13 +116,14 @@ public final class Level {
 
 	public void draw() {
 		game.fill(0xFFAAAAAA); //a neutral grey
-		game.rect(-game.origin.x, -game.origin.y, width*Tile.TILE_SIZE, height*Tile.TILE_SIZE);
+		game.rect(0, 0, width, height);
 
-		Vector2 worldOrigin = game.origin.mul(1.0f/Tile.TILE_SIZE);
-		int minx = Math.max(0, PApplet.floor(worldOrigin.x));
-		int maxx = Math.min(width, PApplet.ceil(worldOrigin.x + game.width/Tile.TILE_SIZE));
-		int miny = Math.max(0, PApplet.floor(worldOrigin.y));
-		int maxy = Math.min(height, PApplet.ceil(worldOrigin.y + game.height/Tile.TILE_SIZE));
+		float vw = game.width/Tile.TILE_SIZE/2; //half viewport width in world coordinates
+		float vh = game.height/Tile.TILE_SIZE/2; //half viewport height in world coordinates
+		int minx = Math.max(0, PApplet.floor(game.origin.x - vw));
+		int maxx = Math.min(width, PApplet.ceil(game.origin.x + vw));
+		int miny = Math.max(0, PApplet.floor(game.origin.y - vh));
+		int maxy = Math.min(height, PApplet.ceil(game.origin.y + vh));
 
 		for (int y = miny; y < maxy; ++y) {
 			for (int x = minx; x < maxx; ++x) {

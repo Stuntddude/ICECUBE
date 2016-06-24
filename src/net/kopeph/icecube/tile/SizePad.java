@@ -20,7 +20,7 @@ public abstract class SizePad extends Tile {
 	@Override
 	public void draw() {
 		game.fill(0xFF000000); //black
-		game.rect(pos.x*TILE_SIZE - game.origin.x, pos.y*TILE_SIZE - game.origin.y, TILE_SIZE, TILE_SIZE);
+		game.rect(pos.x, pos.y, 1, 1);
 
 		//draws a half height tile
 		game.fill(color);
@@ -29,7 +29,6 @@ public abstract class SizePad extends Tile {
 		boolean neighborRight = game.level.tileAt(x + 1, y) instanceof SizePad;
 
 		//draw the pad into the top half of the tile, rounding bottom corners where applicable
-		game.rect(pos.x*TILE_SIZE - game.origin.x, pos.y*TILE_SIZE - game.origin.y, TILE_SIZE, TILE_SIZE/2,
-		          0, 0, neighborRight? 0 : TILE_SIZE, neighborLeft? 0 : TILE_SIZE);
+		game.rect(pos.x, pos.y, 1, 0.5f, 0, 0, neighborRight? 0 : 1, neighborLeft? 0 : 1);
 	}
 }
