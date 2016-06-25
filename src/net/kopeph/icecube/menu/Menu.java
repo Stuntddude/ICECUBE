@@ -23,6 +23,7 @@ public class Menu {
 	}
 
 	public void draw() {
+		game.textFont(game.menuFont);
 		game.background(255);
 		for (int i = 0; i < widgets.size(); ++i)
 			widgets.get(i).draw(i == selection);

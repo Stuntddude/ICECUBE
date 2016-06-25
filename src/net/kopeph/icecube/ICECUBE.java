@@ -33,7 +33,7 @@ public final class ICECUBE extends PApplet {
 		PREFERENCES_NODE    = "settings", //$NON-NLS-1$
 		KEY_LEVEL_NAME      = "level", //$NON-NLS-1$
 		KEY_PLAYER_INFO     = "player", //$NON-NLS-1$
-		KEY_COLORBLIND_MODE = "colorblind",
+		KEY_COLORBLIND_MODE = "colorblind", //$NON-NLS-1$
 		KEY_INVALID         = "/null/"; //$NON-NLS-1$
 
 	public final Preferences diskStore = Preferences.userNodeForPackage(getClass()).node(PREFERENCES_NODE);
@@ -45,7 +45,8 @@ public final class ICECUBE extends PApplet {
 	public int gameState = ST_MENU;
 
 	public boolean colorBlindMode = diskStore.getBoolean(KEY_COLORBLIND_MODE, false);
-	public PFont font;
+	public PFont menuFont;
+	public PFont debugFont;
 	public boolean debug;
 
 	public Level level;
@@ -66,8 +67,8 @@ public final class ICECUBE extends PApplet {
 		surface.setResizable(true);
 		surface.setTitle("ICECUBE         CONTROLS: A-LEFT  D-RIGHT  SPACE-JUMP  R-RESET  MOUSEWHEEL-ZOOM");
 
-		font = createFont("Montserrat-Bold.ttf", 72); //$NON-NLS-1$
-		textFont(font);
+		menuFont = createFont("Montserrat-Bold.ttf", 72); //$NON-NLS-1$
+		debugFont = createFont("DroidSansMono.ttf", 32); //$NON-NLS-1$
 		mainMenu = new MainMenu();
 		settingsMenu = new SettingsMenu();
 		languageMenu = new LanguageMenu();
@@ -126,10 +127,10 @@ public final class ICECUBE extends PApplet {
 
 	public void drawGame() {
 		//apply worldspace transform
-		game.pushMatrix();
-		game.translate(game.width/2, game.height/2);
-		game.scale(Tile.TILE_SIZE, Tile.TILE_SIZE);
-		game.translate(-origin.x, -origin.y);
+		pushMatrix();
+		translate(width/2, height/2);
+		scale(Tile.TILE_SIZE, Tile.TILE_SIZE);
+		translate(-origin.x, -origin.y);
 
 		player.move(Input.handler.isDown(Input.LEFT),
 		            Input.handler.isDown(Input.RIGHT),
@@ -163,7 +164,7 @@ public final class ICECUBE extends PApplet {
 		}
 
 		//reset transfrom
-		game.popMatrix();
+		popMatrix();
 	}
 
 	//the reason to store these as a Map is because a Pair class does not natively exist in Java

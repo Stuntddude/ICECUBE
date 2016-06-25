@@ -1,6 +1,7 @@
 package net.kopeph.icecube.entity;
 
 import processing.core.PApplet;
+import processing.core.PConstants;
 
 import net.kopeph.icecube.ICECUBE;
 import net.kopeph.icecube.tile.BluePad;
@@ -173,7 +174,7 @@ public class Entity {
 
 		Vector2 projected = pos.add(offset); //projected position of entity after applying offset (used for wall sliding)
 
-		offset = moveWithCollisionImpl(offset, offset.y/offset.x);
+		moveWithCollisionImpl(offset, offset.y/offset.x);
 
 		//if we haven't collided, we obviously don't need to slide, so we might as well exit early
 		if (pos.equals(projected))
@@ -313,7 +314,14 @@ public class Entity {
 			++deathFrame;
 		}
 
-		if (game.debug)
+		if (game.debug) {
 			game.drawDebugHitbox(getGroundSensor(), onGround());
+			game.textFont(game.debugFont);
+			game.textSize(0.4999f); //must be below 0.5 (see Processing GitHub issue #4548)
+			game.textAlign(PConstants.CENTER, PConstants.CENTER);
+			game.fill(0xFFFFFFFF); //white
+			game.text(pos.toString(), pos.x + size/2, pos.y - 0.5f);
+			game.text(String.format("%.6f", size), pos.x + size/2, pos.y - 1);
+		}
 	}
 }
