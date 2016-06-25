@@ -1,5 +1,7 @@
 package net.kopeph.icecube;
 
+import java.util.HashMap;
+import java.util.Map;
 import java.util.prefs.Preferences;
 
 import processing.core.PApplet;
@@ -13,6 +15,7 @@ import net.kopeph.icecube.menu.MainMenu;
 import net.kopeph.icecube.menu.Menu;
 import net.kopeph.icecube.menu.SettingsMenu;
 import net.kopeph.icecube.tile.Tile;
+import net.kopeph.icecube.util.Rectangle;
 import net.kopeph.icecube.util.Vector2;
 
 /**
@@ -148,8 +151,28 @@ public final class ICECUBE extends PApplet {
 		level.draw();
 		player.draw();
 
+		if (debug) {
+			for (Map.Entry<Rectangle, Boolean> entry : debugHitboxes.entrySet()) {
+				fill(entry.getValue()? 0xAAFFAA22 : 0xAA22AAFF); //transparent light blue : transparent light red
+				Rectangle hb = entry.getKey();
+				rect(hb.x, hb.y, hb.w, hb.h);
+			}
+
+			//reset the map for the next frame
+			debugHitboxes = new HashMap<>();
+		}
+
 		//reset transfrom
 		game.popMatrix();
+	}
+
+	//the reason to store these as a Map is because a Pair class does not natively exist in Java
+	//and I didn't want to pollute the codebase by writing my own
+	private Map<Rectangle, Boolean> debugHitboxes = new HashMap<>();
+
+	/** queues the given hitbox to be drawn after everything else */
+	public void drawDebugHitbox(Rectangle hb, boolean active) {
+		debugHitboxes.put(hb, active);
 	}
 
 	@Override

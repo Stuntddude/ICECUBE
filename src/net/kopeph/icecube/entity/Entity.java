@@ -313,10 +313,7 @@ public class Entity {
 			++deathFrame;
 		}
 
-		if (game.debug) {
-			game.fill(onGround()? 0xAA22AAFF : 0xAAFFAA22); //transparent light blue : transparent light red
-			Rectangle sensor = getGroundSensor();
-			game.rect(sensor.x, sensor.y, sensor.w, sensor.h);
-		}
+		if (game.debug)
+			game.drawDebugHitbox(getGroundSensor(), onGround());
 	}
 }

@@ -41,5 +41,8 @@ public final class Spring extends Tile {
 
 		//draw the spring into the bottom 1/4 of the tile, rounding top corners where applicable
 		game.rect(pos.x, pos.y + 0.75f, 1, 0.25f, neighborLeft? 0 : 1, neighborRight? 0 : 1, 0, 0);
+
+		if (game.debug)
+			game.drawDebugHitbox(getHitbox(), getHitbox().intersects(game.player.getHitbox()));
 	}
 }

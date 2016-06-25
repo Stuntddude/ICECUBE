@@ -1,5 +1,6 @@
 package net.kopeph.icecube.tile;
 
+import net.kopeph.icecube.util.Rectangle;
 import net.kopeph.icecube.util.Vector2;
 
 /** common superclass of RedTile and BlueTile */
@@ -30,5 +31,10 @@ public abstract class SizePad extends Tile {
 
 		//draw the pad into the top half of the tile, rounding bottom corners where applicable
 		game.rect(pos.x, pos.y, 1, 0.5f, 0, 0, neighborRight? 0 : 1, neighborLeft? 0 : 1);
+
+		if (game.debug) {
+			Rectangle hb = getHitbox().move(0, -0.5f);
+			game.drawDebugHitbox(hb, hb.intersects(game.player.getHitbox()));
+		}
 	}
 }
