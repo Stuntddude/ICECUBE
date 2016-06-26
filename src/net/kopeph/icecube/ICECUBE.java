@@ -126,18 +126,14 @@ public final class ICECUBE extends PApplet {
 	}
 
 	public void drawGame() {
-		//apply worldspace transform
-		pushMatrix();
-		translate(width/2, height/2);
-		scale(Tile.TILE_SIZE, Tile.TILE_SIZE);
-		translate(-origin.x, -origin.y);
-
+		//player movement
 		player.move(Input.handler.isDown(Input.LEFT),
 		            Input.handler.isDown(Input.RIGHT),
 		            Input.handler.isDown(Input.UP),
 		            Input.handler.isDown(Input.DOWN),
 		            Input.handler.isDown(Input.JUMP));
 
+		//physics tick
 		for (Box box : level.boxes)
 			box.tick(new Vector2());
 
@@ -147,6 +143,12 @@ public final class ICECUBE extends PApplet {
 		float maxFollowDistance = MAX_FOLLOW_DISTANCE/Tile.TILE_SIZE; //convert follow cam radius to world coordinates
 		if (distance > maxFollowDistance)
 			origin.subEquals(Vector2.polar(distance - maxFollowDistance, origin.thetaTo(playerCenter)).mulEquals(0.1f));
+
+		//apply worldspace transform
+		pushMatrix();
+		translate(width/2, height/2);
+		scale(Tile.TILE_SIZE, Tile.TILE_SIZE);
+		translate(-origin.x, -origin.y);
 
 		background(0xFF000000); //everything around me is black, the color of my soul
 		level.draw();
