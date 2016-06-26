@@ -113,6 +113,8 @@ public class Entity {
 
 		offset.addEquals(0, vel);
 
+		debugVel = offset.mul(2);
+
 		float oldPosY = pos.y;
 		moveWithCollision(offset);
 		vel = pos.y - oldPosY;
@@ -283,6 +285,8 @@ public class Entity {
 		return offset.subEquals(ejection.mulEquals(EJECTION_EPSILON));
 	}
 
+	private Vector2 debugVel = new Vector2();
+
 	public void draw() {
 		game.fill(color);
 		game.rect(pos.x, pos.y, size, size);
@@ -316,12 +320,18 @@ public class Entity {
 
 		if (game.debug) {
 			game.drawDebugHitbox(getGroundSensor(), onGround());
+
 			game.textFont(game.debugFont);
 			game.textSize(0.4999f); //must be below 0.5 (see Processing GitHub issue #4548)
 			game.textAlign(PConstants.CENTER, PConstants.CENTER);
 			game.fill(0xFFFFFFFF); //white
 			game.text(pos.toString(), pos.x + size/2, pos.y - 0.5f);
 			game.text(String.format("%.6f", size), pos.x + size/2, pos.y - 1);
+
+			game.stroke(0xFFFF00FF); //magenta
+			game.strokeWeight(0.25f);
+			game.line(pos.x + size/2, pos.y + size/2, pos.x + size/2 + debugVel.x, pos.y + size/2 + debugVel.y);
+			game.noStroke();
 		}
 	}
 }
