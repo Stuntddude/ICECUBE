@@ -54,7 +54,7 @@ public class Entity {
 	}
 
 	public Rectangle getGroundSensor() {
-		return new Rectangle(pos.x, pos.y + size, size, 0.1f);
+		return new Rectangle(pos.x, pos.y + size, size, 0.01f);
 	}
 
 	public void moveTo(float x, float y) {
@@ -319,7 +319,7 @@ public class Entity {
 		}
 
 		if (game.debug) {
-			game.drawDebugHitbox(getGroundSensor(), onGround());
+			game.drawDebugHitbox(new Rectangle(pos.x, pos.y + size - 0.04f, size, 0.05f), onGround());
 
 			game.textFont(game.debugFont);
 			game.textSize(0.4999f); //must be below 0.5 (see Processing GitHub issue #4548)
@@ -328,6 +328,7 @@ public class Entity {
 			game.text(pos.toString(), pos.x + size/2, pos.y - 0.5f);
 			game.text(String.format("%.6f", size), pos.x + size/2, pos.y - 1); //$NON-NLS-1$
 
+			//TODO: give this its own layer, like with debug hitboxes
 			game.stroke(0xFFFF00FF); //magenta
 			game.strokeWeight(0.25f);
 			game.line(pos.x + size/2, pos.y + size/2, pos.x + size/2 + debugVel.x, pos.y + size/2 + debugVel.y);
