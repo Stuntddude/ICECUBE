@@ -10,7 +10,7 @@ import processing.core.PApplet;
 import processing.core.PGraphics;
 import processing.core.PImage;
 
-import net.kopeph.icecube.entity.Box;
+import net.kopeph.icecube.entity.Entity;
 import net.kopeph.icecube.tile.*;
 import net.kopeph.icecube.util.Rectangle;
 
@@ -20,8 +20,8 @@ public final class Level {
 
 	public final int width, height;
 	public final Tile[] tiles;
-	private final List<Box> originalBoxes = new ArrayList<>();
-	public List<Box> boxes;
+	private final List<Entity> originalBoxes = new ArrayList<>();
+	public List<Entity> entities;
 
 	//rectangles to simulate collision with the borders of the level
 	public final Rectangle top;
@@ -63,9 +63,9 @@ public final class Level {
 						tiles[i] = new Spring(x, y);
 						break;
 					case 0xFF00FFFF:
-						Box box = new Box(x, y, Float.parseFloat(meta.get(new Point(x, y))), 0);
-						box.moveTo(x + 0.5f, y + 0.5f);
-						originalBoxes.add(box);
+						Entity entity = new Entity(x, y, Float.parseFloat(meta.get(new Point(x, y))), 0, 0xFFDDDDEE); //off-white
+						entity.moveTo(x + 0.5f, y + 0.5f);
+						originalBoxes.add(entity);
 						break;
 					case 0xFFFF00FF:
 						game.player.moveTo(x + 0.5f, y + 0.5f);
@@ -84,9 +84,10 @@ public final class Level {
 	}
 
 	public void reset() {
-		boxes = new ArrayList<Box>();
-		for (Box box : originalBoxes)
-			boxes.add(new Box(box));
+		entities = new ArrayList<>();
+		for (Entity entity : originalBoxes)
+			entities.add(new Entity(entity));
+		entities.add(game.player);
 	}
 
 	/** parses a newline-separated list of door-to-level mappings in the format "x,y:name", ignoring all whitespace */
@@ -133,7 +134,7 @@ public final class Level {
 			}
 		}
 
-		for (Box box : boxes)
-			box.draw();
+		for (Entity entity : entities)
+			entity.draw();
 	}
 }

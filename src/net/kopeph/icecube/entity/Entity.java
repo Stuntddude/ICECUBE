@@ -122,6 +122,8 @@ public class Entity {
 			deathFrame = 0;
 		}
 
+		//TODO: add death condition for if player gets outside of level
+
 		//if the ground sensor is colliding and vertical velocity drops to zero, then mark the entity as grounded
 		//and unmark as soon as the ground sensor is no longer colliding with anything
 		if (grounded)
@@ -130,7 +132,7 @@ public class Entity {
 			grounded = true;
 	}
 
-	private static final float GROWTH = 0.01f;
+	private static final float GROWTH = 0.015f;
 	private static final float EPSILON = 0.000002f;
 
 	protected void grow() {
@@ -190,10 +192,10 @@ public class Entity {
 	private void pushBoxes(Vector2 offset) {
 		Rectangle hb = getHitbox().move(offset);
 
-		for (Box box : game.level.boxes) {
+		for (Entity entity : game.level.entities) {
 			//only push the box if we're coming at it from the side
-			Rectangle collision = box.getHitbox();
-			if (box != this && hb.intersects(collision)) {
+			Rectangle collision = entity.getHitbox();
+			if (entity != this && hb.intersects(collision)) {
 				//XXX: code copied almost wholesale from Entity.eject()
 				//find the shortest path to backtrack that gets the entity to where they're not colliding
 				float dx = offset.x > 0? hb.right()  - collision.x : hb.x - collision.right();
@@ -208,7 +210,7 @@ public class Entity {
 				//which path was shorter tells us what side of the box the entity is hitting the box
 				//TODO: experiment with making the push speed proportional to the ratio between box sizes
 				if (ex.mag() < ey.mag())
-					box.moveWithCollision(new Vector2(offset.x/2, 0));
+					entity.moveWithCollision(new Vector2(offset.x/2, 0));
 			}
 		}
 	}
@@ -251,9 +253,9 @@ public class Entity {
 		}
 
 		//check collision with entities, which could be anywhere
-		for (Box box : game.level.boxes)
-			if (box != this && hb.intersects(box.getHitbox()))
-				return box.getHitbox();
+		for (Entity entity : game.level.entities)
+			if (entity != this && hb.intersects(entity.getHitbox()))
+				return entity.getHitbox();
 
 		return null;
 	}

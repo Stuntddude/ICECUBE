@@ -8,14 +8,14 @@ import net.kopeph.icecube.util.Rectangle;
 import net.kopeph.icecube.util.Vector2;
 
 public final class Player extends Entity {
-	private static final int color = 0xFFFFFFFF; //white
+	private static final int COLOR = 0xFFFFFFFF; //white
 
 	public Player(Player other) {
 		super(other);
 	}
 
 	public Player(float s, float v) {
-		super(new Vector2(0, 0), s, v, color);
+		super(new Vector2(0, 0), s, v, COLOR);
 	}
 
 	private static final float SP = 0.15f;
@@ -68,7 +68,10 @@ public final class Player extends Entity {
 		}
 
 		super.tick(offset);
+	}
 
-		//TODO: add death condition for if player gets outside of level
+	@Override
+	public void tick(Vector2 offset) {
+		//no-op
 	}
 }

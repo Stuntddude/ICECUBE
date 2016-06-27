@@ -8,7 +8,7 @@ import processing.core.PApplet;
 import processing.core.PFont;
 import processing.event.MouseEvent;
 
-import net.kopeph.icecube.entity.Box;
+import net.kopeph.icecube.entity.Entity;
 import net.kopeph.icecube.entity.Player;
 import net.kopeph.icecube.menu.LanguageMenu;
 import net.kopeph.icecube.menu.MainMenu;
@@ -110,6 +110,7 @@ public final class ICECUBE extends PApplet {
 	}
 
 	public void resetLevel() {
+		level.entities.remove(player);
 		player = new Player(backup);
 		level.reset();
 	}
@@ -134,8 +135,8 @@ public final class ICECUBE extends PApplet {
 		            Input.handler.isDown(Input.JUMP));
 
 		//physics tick
-		for (Box box : level.boxes)
-			box.tick(new Vector2());
+		for (Entity entity : level.entities)
+			entity.tick(new Vector2());
 
 		//update follow cam origin
 		Vector2 playerCenter = player.getHitbox().center();
@@ -219,7 +220,8 @@ public final class ICECUBE extends PApplet {
 
 	@Override
 	public void mouseWheel(MouseEvent e) {
-		//scale by 2^(1/n) where n is the number of scale increments between each power-of-two zoom level
+		//n is the number of scale increments between each power-of-two zoom level
+		//there's no particular reason to use power-of-two zoom levels anymore, oh well
 		Tile.TILE_SIZE *= pow(pow(2.0f, 0.25f), -e.getCount());
 	}
 
