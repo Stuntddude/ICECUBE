@@ -50,11 +50,11 @@ public class Entity {
 	}
 
 	public Rectangle getHitbox() {
-		return new Rectangle(pos.x, pos.y, size - BREATHING_ROOM, size - BREATHING_ROOM);
+		return new Rectangle(pos.x, pos.y, size, size);
 	}
 
 	public Rectangle getGroundSensor() {
-		return new Rectangle(pos.x + BREATHING_ROOM*2, pos.y + size, size - BREATHING_ROOM*4, 0.1f);
+		return new Rectangle(pos.x, pos.y + size, size, 0.1f);
 	}
 
 	public void moveTo(float x, float y) {
@@ -72,7 +72,8 @@ public class Entity {
 			return;
 
 		//do gravity
-		vel += GRAVITY;
+		if (!grounded)
+			vel += GRAVITY;
 
 		//so that intersecting multiple interactive tiles doesn't multiply their effect
 		boolean shouldGrow = false, shouldShrink = false, boing = false;
@@ -82,7 +83,7 @@ public class Entity {
 		Rectangle hb = getHitbox();
 		int minx = Math.max(0, PApplet.floor(hb.x));
 		int maxx = Math.min(game.level.width, PApplet.ceil(hb.right()));
-		int miny = Math.max(0, PApplet.floor(hb.bottom()));
+		int miny = Math.max(0, PApplet.floor(hb.y));
 		int maxy = Math.min(game.level.height - 1, PApplet.ceil(hb.bottom()));
 		for (int y = miny; y <= maxy; ++y) {
 			for (int x = minx; x < maxx; ++x) {
@@ -90,21 +91,18 @@ public class Entity {
 				if (tile instanceof Spring && hb.intersects(tile.getHitbox())) {
 					boing = true;
 				} else if (tile instanceof SizePad && hb.intersects(tile.getHitbox().move(0, -0.5f))) {
-					//TODO: consider replacing this with collision-based logic
-					//where if an Entity collides with a SizePad from above, they will grow or shrink on the next frame
-					if (tile instanceof BluePad) {
+					if (tile instanceof BluePad)
 						shouldGrow = true;
-						//XXX: MORE DUCT TAPE
-						pos.subEquals(0, BREATHING_ROOM);
-					} else {
+					else
 						shouldShrink = true;
-					}
 				}
 			}
 		}
 
-		if (boing && onGround())
+		if (boing && grounded) {
 			vel = -0.6f/PApplet.max(size, 0.38f);
+			grounded = false;
+		}
 
 		if (shouldShrink && !shouldGrow)
 			shrink();
@@ -123,49 +121,49 @@ public class Entity {
 			dead = true;
 			deathFrame = 0;
 		}
+
+		//if the ground sensor is colliding and vertical velocity drops to zero, then mark the entity as grounded
+		//and unmark as soon as the ground sensor is no longer colliding with anything
+		if (grounded)
+			grounded = onGround();
+		else if (vel < 0.00001 && vel > -0.00001 && onGround())
+			grounded = true;
 	}
 
 	private static final float GROWTH = 0.01f;
+	private static final float EPSILON = 0.000002f;
 
 	protected void grow() {
 		//try to grow entity from the bottom center of their hitbox, if possible
 		//otherwise, try growing from the bottom left or bottom right
 		if (growImpl(GROWTH/2)) {
-			pos.subEquals(GROWTH/2, GROWTH);
+			pos.subEquals(GROWTH/2, GROWTH + EPSILON);
 			size += GROWTH;
 		} else if (growImpl(GROWTH)) {
-			pos.subEquals(GROWTH, GROWTH);
+			pos.subEquals(GROWTH, GROWTH + EPSILON);
 			size += GROWTH;
 		} else if (growImpl(0)) {
-			pos.subEquals(0, GROWTH);
+			pos.subEquals(0, GROWTH + EPSILON);
 			size += GROWTH;
 		}
 	}
 
 	protected boolean growImpl(float xcomp) {
-		return findIntersection(getHitbox().move(-xcomp, -GROWTH).grow(GROWTH, GROWTH)) == null;
+		return findIntersection(getHitbox().move(-xcomp, -GROWTH - EPSILON).grow(GROWTH, GROWTH)) == null;
 	}
 
 	protected void shrink() {
 		if (size > 0.5f) {
-			pos.addEquals(GROWTH/2, GROWTH);
+			pos.addEquals(GROWTH/2, GROWTH - EPSILON);
 			size -= GROWTH;
 		} else {
-			pos.addEquals(GROWTH/4, GROWTH/2);
+			pos.addEquals(GROWTH/4, GROWTH/2 - EPSILON);
 			size -= GROWTH/2;
 		}
 	}
 
-	//the factor by which to over-eject the entity to avoid potential floating point weirdness
-	protected static final float EJECTION_EPSILON = 1.00001f;
-
-	//the amount by which to shrink the entity's hitbox, also to avoid floating point weirdness
-	//this may not be necessary, since the entity is supposed to be constantly changing size anyway
-	//but I'm keeping it here for now because I don't think it hurts anything to have this safeguard
-	protected static final float BREATHING_ROOM = 0.0001f; //should be greater than (EJECTION_EPSILON - 1.0)
-
 	//XXX: code smell: using class variables for functionality of method internals
-	protected boolean verticalSlide;
+	protected boolean verticalSlide, grounded;
 
 	//TODO: contingency plan for if the entity does somehow get stuck inside of a tile they can't be ejected out of
 	//I assume players will mostly prefer an apparent glitch over the game freezing seemingly for no reason
@@ -282,7 +280,7 @@ public class Entity {
 		//whichever path was shorter should also tell us what direction (vertical or horizontal) the entity should slide along the wall
 		verticalSlide = ex.mag() < ey.mag();
 
-		return offset.subEquals(ejection.mulEquals(EJECTION_EPSILON));
+		return offset.subEquals(ejection);
 	}
 
 	private Vector2 debugVel = new Vector2();
@@ -326,7 +324,7 @@ public class Entity {
 			game.textAlign(PConstants.CENTER, PConstants.CENTER);
 			game.fill(0xFFFFFFFF); //white
 			game.text(pos.toString(), pos.x + size/2, pos.y - 0.5f);
-			game.text(String.format("%.6f", size), pos.x + size/2, pos.y - 1);
+			game.text(String.format("%.6f", size), pos.x + size/2, pos.y - 1); //$NON-NLS-1$
 
 			game.stroke(0xFFFF00FF); //magenta
 			game.strokeWeight(0.25f);

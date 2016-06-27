@@ -35,9 +35,6 @@ public final class Player extends Entity {
 		Vector2 offset = new Vector2(0, 0);
 		if (left)  offset.addEquals(-SP, 0);
 		if (right) offset.addEquals( SP, 0);
-		//I'm adding small y-offset to the movement so the player doesn't get stuck on the ground
-		//this is DUCT TAPE! once the jam is over, the actual problem needs to be diagnosed and addressed
-		if ((left || right) && onGround()) pos.addEquals(0, -0.00001f);
 
 		//debug growth
 		if (up)
@@ -48,8 +45,10 @@ public final class Player extends Entity {
 		//my size gives me strength!
 		float jumpStrength = 0.23f + 0.11f*size;
 
-		if (space && onGround())
+		if (space && grounded) {
 			vel = -jumpStrength; //jump!
+			grounded = false;
+		}
 
 		//interact with TransportTiles
 		//only loop through tiles near the player, for efficiency
@@ -71,7 +70,5 @@ public final class Player extends Entity {
 		super.tick(offset);
 
 		//TODO: add death condition for if player gets outside of level
-
-		//PApplet.println("player: " + pos + "\tvelocity: " + vel + "\tsize: " + size + "\t" + offset); //DEBUG
 	}
 }

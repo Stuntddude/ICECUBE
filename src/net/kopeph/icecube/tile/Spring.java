@@ -16,7 +16,6 @@ public final class Spring extends Tile {
 
 	@Override
 	public Rectangle getHitbox() {
-		//XXX: wet code smell
 		int x = Math.round(pos.x), y = Math.round(pos.y);
 		boolean neighborLeft = game.level.tileAt(x - 1, y) instanceof Spring;
 		boolean neighborRight = game.level.tileAt(x + 1, y) instanceof Spring;
