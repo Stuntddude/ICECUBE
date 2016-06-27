@@ -95,7 +95,7 @@ public final class ICECUBE extends PApplet {
 
 	public void newGame() {
 		player = new Player(1, 0);
-		changeLevel("old/menu"); //$NON-NLS-1$
+		changeLevel("test/test10"); //$NON-NLS-1$
 		gameState = ST_GAME;
 	}
 
@@ -153,7 +153,6 @@ public final class ICECUBE extends PApplet {
 
 		background(0xFF000000); //everything around me is black, the color of my soul
 		level.draw();
-		player.draw();
 
 		if (debug) {
 			for (Map.Entry<Rectangle, Boolean> entry : debugHitboxes.entrySet()) {

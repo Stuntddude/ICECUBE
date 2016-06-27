@@ -42,6 +42,6 @@ public final class Spring extends Tile {
 		game.rect(pos.x, pos.y + 0.75f, 1, 0.25f, neighborLeft? 0 : 1, neighborRight? 0 : 1, 0, 0);
 
 		if (game.debug)
-			game.drawDebugHitbox(getHitbox(), getHitbox().intersects(game.player.getHitbox()));
+			game.drawDebugHitbox(getHitbox(), game.level.occupied(getHitbox()));
 	}
 }

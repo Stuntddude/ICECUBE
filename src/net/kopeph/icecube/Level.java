@@ -115,6 +115,14 @@ public final class Level {
 		return tiles[y*width + x];
 	}
 
+	/** @return true iff the given hitbox intersects with any entity */
+	public boolean occupied(Rectangle hb) {
+		for (Entity entity : entities)
+			if (hb.intersects(entity.getHitbox()))
+				return true;
+		return false;
+	}
+
 	public void draw() {
 		game.fill(0xFFAAAAAA); //a neutral grey
 		game.rect(0, 0, width, height);
@@ -136,5 +144,8 @@ public final class Level {
 
 		for (Entity entity : entities)
 			entity.draw();
+
+		//fucking thank god for functional programming making my life easier
+		entities.removeIf(e -> e.deathFrame > 36);
 	}
 }

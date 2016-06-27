@@ -72,6 +72,6 @@ public final class Player extends Entity {
 
 	@Override
 	public void tick(Vector2 offset) {
-		//no-op
+		//no-op override so the player's physics tick doesn't run twice per frame
 	}
 }

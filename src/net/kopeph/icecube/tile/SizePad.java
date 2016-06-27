@@ -34,7 +34,7 @@ public abstract class SizePad extends Tile {
 
 		if (game.debug) {
 			Rectangle hb = getHitbox().move(0, -0.5f);
-			game.drawDebugHitbox(hb, hb.intersects(game.player.getHitbox()));
+			game.drawDebugHitbox(hb, game.level.occupied(hb));
 		}
 	}
 }

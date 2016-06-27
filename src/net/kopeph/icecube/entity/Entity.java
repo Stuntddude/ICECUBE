@@ -20,8 +20,8 @@ public class Entity {
 
 	private final int color;
 
-	protected boolean dead = false;
-	protected int deathFrame = 0; //used to drive the death animation; incremented every frame upon death
+	public boolean dead = false;
+	public int deathFrame = 0; //used to drive the death animation; incremented every frame upon death
 
 	public Entity(Entity other) {
 		pos = new Vector2(other.pos);
