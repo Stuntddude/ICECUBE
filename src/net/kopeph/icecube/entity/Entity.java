@@ -128,7 +128,7 @@ public class Entity {
 		//and unmark as soon as the ground sensor is no longer colliding with anything
 		if (grounded)
 			grounded = onGround();
-		else if (vel < 0.00001 && vel > -0.00001 && onGround())
+		else if (vel > -0.001 && onGround())
 			grounded = true;
 	}
 
