@@ -100,7 +100,7 @@ public class Entity {
 		}
 
 		if (boing && grounded) {
-			vel = -0.6f/PApplet.max(size, 0.38f);
+			vel = -1.0f/PApplet.sqrt(PApplet.max(size, 0.25f));
 			grounded = false;
 		}
 
