@@ -47,7 +47,7 @@ public final class ICECUBE extends PApplet {
 	public boolean colorBlindMode = diskStore.getBoolean(KEY_COLORBLIND_MODE, false);
 	public PFont menuFont;
 	public PFont debugFont;
-	public boolean debug;
+	public boolean debug, slowmo;
 
 	public Level level;
 	public Player player;
@@ -205,6 +205,8 @@ public final class ICECUBE extends PApplet {
 			} else {
 				if (control == Input.DEBUG)
 					debug = !debug;
+				else if (control == Input.SLOWMO)
+					frameRate((slowmo = !slowmo)? 6 : 60); //the absolute worst
 				else if (control == Input.RESET)
 					resetLevel();
 				else if (control == Input.ESC) {

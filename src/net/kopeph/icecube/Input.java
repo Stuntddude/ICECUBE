@@ -16,8 +16,9 @@ public final class Input {
 		SELECT =  6,
 		ESC    =  7,
 		DEBUG  =  8,
-		OTHER  =  9,
-		LENGTH = 10;
+		SLOWMO =  9,
+		OTHER  = 10,
+		LENGTH = 11;
 
 	//counts the number of applicable keys currently down for a given control code
 	//so that if e.g. the player presses A, then presses LEFT, then releases A, they won't stall
@@ -39,6 +40,7 @@ public final class Input {
 			case '\r': case '\n':             return SELECT;
 			case KeyEvent.VK_ESCAPE:          return ESC;
 			case '`':                         return DEBUG;
+			case 'F':                         return SLOWMO;
 		}
 		return OTHER;
 	}
