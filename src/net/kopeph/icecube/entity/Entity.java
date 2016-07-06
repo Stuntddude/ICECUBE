@@ -50,7 +50,7 @@ public class Entity {
 	}
 
 	public Rectangle getHitbox() {
-		return new Rectangle(pos.x, pos.y, size, size);
+		return new Rectangle(pos.x, pos.y, size, size, this);
 	}
 
 	public Rectangle getGroundSensor() {
@@ -172,8 +172,6 @@ public class Entity {
 	//we can do this by keeping a list of tiles we've ejected from, and breaking out if we hit a repeat
 	//or simply limiting the number of ejections allowed to some reasonable upper bound, like 100
 	protected void moveWithCollision(Vector2 offset) {
-		pushBoxes(offset);
-
 		Vector2 projected = pos.add(offset); //projected position of entity after applying offset (used for wall sliding)
 
 		moveWithCollisionImpl(offset, offset.y/offset.x);
@@ -187,48 +185,6 @@ public class Entity {
 		offset = verticalSlide? new Vector2(0, offset.y) : new Vector2(offset.x, 0);
 
 		moveWithCollisionImpl(offset, offset.y/offset.x);
-	}
-
-	private void pushBoxes(Vector2 offset) {
-		Rectangle hb = getHitbox().move(offset);
-
-		for (Entity entity : game.level.entities) {
-			//only push the box if we're coming at it from the side
-			Rectangle collision = entity.getHitbox();
-			if (entity != this && hb.intersects(collision)) {
-				//XXX: code copied almost wholesale from Entity.eject()
-				//find the shortest path to backtrack that gets the entity to where they're not colliding
-				float dx = offset.x > 0? hb.right()  - collision.x : hb.x - collision.right();
-				float dy = offset.y > 0? hb.bottom() - collision.y : hb.y - collision.bottom();
-
-				float slope = offset.y/offset.x; //division by 0 should not be an issue since we get infinity, which plays nicely with the next step
-
-				//trace backward along the entity's path using each of the supplied ejection distances, and compare their length
-				Vector2 ex = new Vector2(dx, dx*slope);
-				Vector2 ey = new Vector2(dy/slope, dy); //division by 0 should not be an issue since we get infinity, and that gets discarded at the next step
-
-				//which path was shorter tells us what side of the box the entity is hitting the box
-				//TODO: experiment with making the push speed proportional to the ratio between box sizes
-				if (ex.mag() < ey.mag()) {
-					entity.moveWithCollision(new Vector2(offset.x/2, 0));
-				} else {
-					//the idea here is to conserve combined speed (or once I get it implemented, combined momentum)
-					//in a perfectly inelastic collision, so the output velocity of each Entity is equal to the
-					//average velocity (or later, momentum) going into the collision
-					float velAvg = (offset.y + entity.vel)/2;
-					float velDiff = offset.y - entity.vel;
-					entity.moveWithCollision(new Vector2(0, velAvg + velDiff/2));
-
-					//XXX: this may require writing a more complex algorithm that takes into account the time
-					//within the tick that the entities collide. As it stands, I think it may be possible to get more
-					//velocity out than you put in, because the pushing entity will push before it actually collides,
-					//which pushes the pushed entity farther than it should, which allows the pushing entity
-					//to move further in the following movement tick than it would otherwise be able to, which determines velocity
-
-					//in fact, this may need to be done in an entirely different way. I'll think on it.
-				}
-			}
-		}
 	}
 
 	/** find and resolve all collisions for a given offset */
@@ -276,6 +232,7 @@ public class Entity {
 		return null;
 	}
 
+	//find the shortest path to backtrack that gets the entity to where they're not colliding
 	private Vector2 eject(Rectangle collision, Vector2 offset, float slope) {
 		//XXX: do we need to protect against NaNs?
 		if (offset.x == 0.0f && offset.y == 0.0f)
@@ -284,7 +241,6 @@ public class Entity {
 		//the projected position after offset, to test for intersections
 		Rectangle hb = getHitbox().move(offset);
 
-		//find the shortest path to backtrack that gets the entity to where they're not colliding
 		//the minimum distance straight along x or y axis the entity must be ejected to exit collision
 		float dx = offset.x > 0? hb.right()  - collision.x : hb.x - collision.right();
 		float dy = offset.y > 0? hb.bottom() - collision.y : hb.y - collision.bottom();
@@ -297,6 +253,26 @@ public class Entity {
 		Vector2 ejection = ex.mag() < ey.mag()? ex : ey;
 		//whichever path was shorter should also tell us what direction (vertical or horizontal) the entity should slide along the wall
 		verticalSlide = ex.mag() < ey.mag();
+
+		//handle Entities pushing Entities pushing Entities pushing Entities pushing...
+		if (collision.owner != null) {
+			if (verticalSlide) {
+				collision.owner.moveWithCollision(new Vector2(offset.x/2, 0));
+				collision = collision.owner.getHitbox(); //update for the box's new position after being pushed
+
+				//adjust ejection for the new position of the box after being pushed
+				//the vertical slide direction can't change in this case, but the ejection distance can change
+				if (hb.intersects(collision)) {
+					dx = offset.x > 0? hb.right()  - collision.x : hb.x - collision.right();
+					ejection = new Vector2(dx, dx*slope);
+				} else {
+					//if we're not even colliding anymore, then hey, just ignore it
+					return offset;
+				}
+			} else {
+				//TODO: vertical push code
+			}
+		}
 
 		return offset.subEquals(ejection);
 	}

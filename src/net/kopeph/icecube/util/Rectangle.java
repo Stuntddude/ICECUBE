@@ -1,21 +1,34 @@
 package net.kopeph.icecube.util;
 
+import net.kopeph.icecube.entity.Entity;
+
 /** @immutable */
 public final class Rectangle {
 	public final float x, y, w, h;
+	public final Entity owner; //the Entity whose hitbox this is, or null if this is not an Entity's hitbox
 
-	public Rectangle(float x, float y, float w, float h) {
+	public Rectangle(float x, float y, float w, float h, Entity owner) {
 		this.x = x;
 		this.y = y;
 		this.w = w;
 		this.h = h;
+		this.owner = owner;
 	}
 
-	public Rectangle(Vector2 position, Vector2 dimensions) {
+	public Rectangle(Vector2 position, Vector2 dimensions, Entity owner) {
 		x = position.x;
 		y = position.y;
 		w = dimensions.x;
 		h = dimensions.y;
+		this.owner = owner;
+	}
+
+	public Rectangle(float x, float y, float w, float h) {
+		this(x, y, w, h, null);
+	}
+
+	public Rectangle(Vector2 position, Vector2 dimensions) {
+		this(position, dimensions, null);
 	}
 
 	public Rectangle move(float dx, float dy) {
