@@ -215,8 +215,9 @@ public class Entity {
 					//the idea here is to conserve combined speed (or once I get it implemented, combined momentum)
 					//in a perfectly inelastic collision, so the output velocity of each Entity is equal to the
 					//average velocity (or later, momentum) going into the collision
+					float velAvg = (offset.y + entity.vel)/2;
 					float velDiff = offset.y - entity.vel;
-					entity.moveWithCollision(new Vector2(0, offset.y/2));
+					entity.moveWithCollision(new Vector2(0, velAvg + velDiff/2));
 
 					//XXX: this may require writing a more complex algorithm that takes into account the time
 					//within the tick that the entities collide. As it stands, I think it may be possible to get more
