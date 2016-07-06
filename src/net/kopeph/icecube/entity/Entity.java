@@ -209,8 +209,23 @@ public class Entity {
 
 				//which path was shorter tells us what side of the box the entity is hitting the box
 				//TODO: experiment with making the push speed proportional to the ratio between box sizes
-				if (ex.mag() < ey.mag())
+				if (ex.mag() < ey.mag()) {
 					entity.moveWithCollision(new Vector2(offset.x/2, 0));
+				} else {
+					//the idea here is to conserve combined speed (or once I get it implemented, combined momentum)
+					//in a perfectly inelastic collision, so the output velocity of each Entity is equal to the
+					//average velocity (or later, momentum) going into the collision
+					float velDiff = offset.y - entity.vel;
+					entity.moveWithCollision(new Vector2(0, offset.y/2));
+
+					//XXX: this may require writing a more complex algorithm that takes into account the time
+					//within the tick that the entities collide. As it stands, I think it may be possible to get more
+					//velocity out than you put in, because the pushing entity will push before it actually collides,
+					//which pushes the pushed entity farther than it should, which allows the pushing entity
+					//to move further in the following movement tick than it would otherwise be able to, which determines velocity
+
+					//in fact, this may need to be done in an entirely different way. I'll think on it.
+				}
 			}
 		}
 	}

@@ -95,7 +95,7 @@ public final class ICECUBE extends PApplet {
 
 	public void newGame() {
 		player = new Player(1, 0);
-		changeLevel("test/test17"); //$NON-NLS-1$
+		changeLevel("test/test16"); //$NON-NLS-1$
 		gameState = ST_GAME;
 	}
 
