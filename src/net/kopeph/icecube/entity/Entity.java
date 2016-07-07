@@ -110,12 +110,8 @@ public class Entity {
 			grow();
 
 		offset.addEquals(0, vel);
-
 		debugVel = offset.mul(2);
-
-		float oldPosY = pos.y;
 		moveWithCollision(offset);
-		vel = pos.y - oldPosY;
 
 		if (size <= 0.01f) {
 			dead = true;
@@ -253,6 +249,9 @@ public class Entity {
 		Vector2 ejection = ex.mag() < ey.mag()? ex : ey;
 		//whichever path was shorter should also tell us what direction (vertical or horizontal) the entity should slide along the wall
 		verticalSlide = ex.mag() < ey.mag();
+
+		if (!verticalSlide)
+			vel = 0;
 
 		//handle Entities pushing Entities pushing Entities pushing Entities pushing...
 		if (collision.owner != null) {
