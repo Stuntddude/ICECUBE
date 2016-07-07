@@ -16,7 +16,7 @@ public class Entity {
 
 	protected Vector2 pos;
 	protected float size;
-	protected float vel;
+	public float vel;
 
 	private final int color;
 
@@ -250,9 +250,6 @@ public class Entity {
 		//whichever path was shorter should also tell us what direction (vertical or horizontal) the entity should slide along the wall
 		verticalSlide = ex.mag() < ey.mag();
 
-		if (!verticalSlide)
-			vel = 0;
-
 		//handle Entities pushing Entities pushing Entities pushing Entities pushing...
 		if (collision.owner != null) {
 			if (verticalSlide) {
@@ -269,9 +266,12 @@ public class Entity {
 					return offset;
 				}
 			} else {
-				//TODO: vertical push code
+				game.registerDynamicCollision(this, collision.owner, vel, collision.owner.vel);
 			}
 		}
+
+		if (!verticalSlide)
+			vel = 0;
 
 		return offset.subEquals(ejection);
 	}

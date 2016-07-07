@@ -1,6 +1,8 @@
 package net.kopeph.icecube;
 
+import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 import java.util.prefs.Preferences;
 
@@ -138,6 +140,14 @@ public final class ICECUBE extends PApplet {
 		for (Entity entity : level.entities)
 			entity.tick(new Vector2());
 
+		//resolve dynamic collisions
+		//TODO: extend this to correctly handle groups
+		for (DynamicCollision collision : dynamicCollisions)
+			collision.a.vel = collision.b.vel = (collision.va + collision.vb)/2;
+
+		//reset the list for next frame
+		dynamicCollisions = new ArrayList<>();
+
 		//update follow cam origin
 		Vector2 playerCenter = player.getHitbox().center();
 		float distance = origin.distanceTo(playerCenter);
@@ -154,6 +164,7 @@ public final class ICECUBE extends PApplet {
 		background(0xFF000000); //everything around me is black, the color of my soul
 		level.draw();
 
+		//draw debug hitboxes
 		if (debug) {
 			for (Map.Entry<Rectangle, Boolean> entry : debugHitboxes.entrySet()) {
 				fill(entry.getValue()? 0xAAFFAA22 : 0xAA22AAFF); //transparent light blue : transparent light red
@@ -167,6 +178,29 @@ public final class ICECUBE extends PApplet {
 
 		//reset transfrom
 		popMatrix();
+	}
+
+	private final class DynamicCollision {
+		public final Entity a, b;
+		public final float va, vb;
+
+		public DynamicCollision(Entity a, Entity b, float va, float vb) {
+			this.a = a;
+			this.b = b;
+			this.va = va;
+			this.vb = vb;
+		}
+	}
+
+	private List<DynamicCollision> dynamicCollisions = new ArrayList<>();
+
+	public void registerDynamicCollision(Entity a, Entity b, float va, float vb) {
+		//avoid duplicates
+		for (DynamicCollision collision : dynamicCollisions)
+			if (collision.a == b && collision.b == a)
+				return;
+
+		dynamicCollisions.add(new DynamicCollision(a, b, va, vb));
 	}
 
 	//the reason to store these as a Map is because a Pair class does not natively exist in Java
