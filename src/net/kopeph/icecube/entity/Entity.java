@@ -266,7 +266,7 @@ public class Entity {
 					return offset;
 				}
 			} else {
-				game.registerDynamicCollision(this, collision.owner, vel, collision.owner.vel);
+				//TODO: vertical interaction
 			}
 		}
 
