@@ -2,6 +2,8 @@ ICECUBE
 =======
 A continuation of my compo entry to Ludum Dare 34
 
+http://ludumdare.com/compo/ludum-dare-34/?action=preview&uid=31623
+
 
 Building Directions (Eclipse Java 8)
 ------------------------------------
